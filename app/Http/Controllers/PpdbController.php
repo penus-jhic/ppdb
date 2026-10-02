@@ -511,7 +511,19 @@ class PpdbController extends Controller
         $gelombangId = $request->get('gelombang');
         $sort = $request->get('sort', 'terbaru');
 
-        $query = PpdbRegistration::with('gelombang');
+        $query = PpdbRegistration::query()->select([
+            'id',
+            'nomor_registrasi',
+            'nama_lengkap',
+            'nama_panggilan',
+            'jenis_kelamin',
+            'nisn',
+            'nomor_kk',
+            'jurusan',
+            'jalur_seleksi',
+            'status',
+            'created_at',
+        ]);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -550,11 +562,20 @@ class PpdbController extends Controller
 
         $pendaftarList = $query->paginate(8)->withQueryString();
 
-        // Hitungan ringkasan tab
-        $countAll = PpdbRegistration::count();
-        $countMenunggu = PpdbRegistration::where('status', 'menunggu_verifikasi')->count();
-        $countTerverifikasi = PpdbRegistration::where('status', 'terverifikasi')->count();
-        $countLulus = PpdbRegistration::where('status', 'lulus_seleksi')->count();
+        // Hitungan ringkasan tab (1 query agregasi efisien via toBase)
+        $counts = PpdbRegistration::toBase()
+            ->selectRaw("
+                COUNT(*) as count_all,
+                SUM(CASE WHEN status = 'menunggu_verifikasi' THEN 1 ELSE 0 END) as count_menunggu,
+                SUM(CASE WHEN status = 'terverifikasi' THEN 1 ELSE 0 END) as count_terverifikasi,
+                SUM(CASE WHEN status = 'lulus_seleksi' THEN 1 ELSE 0 END) as count_lulus
+            ")
+            ->first();
+
+        $countAll = (int) ($counts->count_all ?? 0);
+        $countMenunggu = (int) ($counts->count_menunggu ?? 0);
+        $countTerverifikasi = (int) ($counts->count_terverifikasi ?? 0);
+        $countLulus = (int) ($counts->count_lulus ?? 0);
 
         $majors = $this->majors;
         $waves = PpdbWave::all();
