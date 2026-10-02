@@ -29,7 +29,7 @@ Route::prefix('ppdb')->group(function () {
     Route::post('/daftar', [PpdbController::class, 'store'])->name('ppdb.store');
     Route::get('/akomodasi', [PpdbController::class, 'akomodasi'])->name('ppdb.akomodasi');
     Route::get('/pengumuman', [PpdbController::class, 'pengumuman'])->name('ppdb.pengumuman');
-    Route::get('/cek-status', [PpdbController::class, 'cekStatus'])->name('ppdb.cek-status');
+    Route::match(['GET', 'POST'], '/cek-status', [PpdbController::class, 'cekStatus'])->name('ppdb.cek-status');
     Route::get('/cetak-kartu/{id}', [PpdbController::class, 'cetakKartu'])->name('ppdb.cetak-kartu');
     Route::match(['GET', 'POST'], '/logout', function () {
         return redirect('/ppdb')->withoutCookie('access_token');

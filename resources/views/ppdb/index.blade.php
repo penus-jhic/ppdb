@@ -47,6 +47,12 @@
                         <span class="text-brand-ink/60 text-xs font-semibold uppercase tracking-wider">Nama Lengkap</span>
                         <span class="font-bold text-brand-ink" x-text="formData.namaLengkap"></span>
                     </div>
+                    <template x-if="formData.nisn">
+                        <div class="py-2.5 flex justify-between items-center text-sm">
+                            <span class="text-brand-ink/60 text-xs font-semibold uppercase tracking-wider">NISN</span>
+                            <span class="font-bold text-brand-ink font-mono" x-text="formData.nisn"></span>
+                        </div>
+                    </template>
                     <div class="py-2.5 flex justify-between items-center text-sm">
                         <span class="text-brand-ink/60 text-xs font-semibold uppercase tracking-wider">Pilihan Keahlian</span>
                         <span class="font-bold text-brand-darkred text-right" x-text="formData.jurusan || '-'"></span>
@@ -581,7 +587,33 @@
                                     </div>
                                 </div>
 
-                                <!-- 6. Nomor Kartu Keluarga (Optional) -->
+                                <!-- 6. Nomor Induk Siswa Nasional (NISN) -->
+                                <div class="w-full">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-ink/70 mb-2 select-none">
+                                        Nomor Induk Siswa Nasional (NISN)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nisn"
+                                        x-model="formData.nisn"
+                                        @input="formData.nisn = formData.nisn.replace(/\D/g, '')"
+                                        @blur="handleBlur('nisn')"
+                                        maxlength="10"
+                                        placeholder="10 Digit NISN (cth: 0081298471)"
+                                        class="w-full rounded-full border text-sm text-brand-ink placeholder:text-brand-ink/40 bg-[#F9F8F6] focus:bg-white px-5 py-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-darkred/20 focus:border-brand-darkred font-mono"
+                                        :class="touched.nisn && errors.nisn ? 'border-brand-signal ring-1 ring-brand-signal/30' : 'border-brand-ink/15 hover:border-brand-ink/35'"
+                                    />
+                                    <template x-if="touched.nisn && errors.nisn">
+                                        <p class="text-[12px] text-brand-signal font-semibold mt-1.5" x-text="errors.nisn"></p>
+                                    </template>
+                                    <template x-if="!(touched.nisn && errors.nisn)">
+                                        <p class="text-[12px] text-brand-ink/60 mt-1.5 leading-normal">
+                                            10 digit nomor NISN resmi dari SMP/MTs (dapat dicek pada rapor atau kartu pelajar)
+                                        </p>
+                                    </template>
+                                </div>
+
+                                <!-- 7. Nomor Kartu Keluarga (Optional) -->
                                 <div class="w-full">
                                     <label class="block text-xs font-bold uppercase tracking-wider text-brand-ink/70 mb-2 select-none">
                                         Nomor Kartu Keluarga
@@ -590,16 +622,17 @@
                                         type="text"
                                         id="nomorKK"
                                         x-model="formData.nomorKK"
+                                        @input="formData.nomorKK = formData.nomorKK.replace(/\D/g, '')"
                                         maxlength="16"
                                         placeholder="16 Digit Nomor KK"
-                                        class="w-full rounded-full border text-sm text-brand-ink placeholder:text-brand-ink/40 bg-[#F9F8F6] focus:bg-white px-5 py-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-darkred/20 focus:border-brand-darkred border-brand-ink/15 hover:border-brand-ink/35"
+                                        class="w-full rounded-full border text-sm text-brand-ink placeholder:text-brand-ink/40 bg-[#F9F8F6] focus:bg-white px-5 py-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-darkred/20 focus:border-brand-darkred font-mono border-brand-ink/15 hover:border-brand-ink/35"
                                     />
                                     <p class="text-[12px] text-brand-ink/60 mt-1.5 leading-normal">
                                         Opsional: Dapat dilengkapi nanti pada saat verifikasi fisik berkas
                                     </p>
                                 </div>
 
-                                <!-- 7. Alamat Lengkap -->
+                                <!-- 8. Alamat Lengkap -->
                                 <div class="w-full">
                                     <label class="block text-xs font-bold uppercase tracking-wider text-brand-ink/70 mb-2 select-none">
                                         Alamat Lengkap Domisili
@@ -1163,6 +1196,10 @@
                                         <span class="font-semibold text-brand-ink text-left sm:text-right" x-text="formData.namaPanggilan || '-'"></span>
                                     </div>
                                     <div class="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                        <span class="text-xs font-bold uppercase tracking-wider text-brand-ink/60">Nomor NISN</span>
+                                        <span class="font-semibold text-brand-ink font-mono text-left sm:text-right" x-text="formData.nisn || '-'"></span>
+                                    </div>
+                                    <div class="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="text-xs font-bold uppercase tracking-wider text-brand-ink/60">Nomor Kartu Keluarga</span>
                                         <span class="font-semibold text-brand-ink text-left sm:text-right" x-text="formData.nomorKK || '-'"></span>
                                     </div>
@@ -1460,6 +1497,7 @@ function ppdbForm() {
         errors: {},
         touched: {},
         submissionData: {
+            id: null,
             noPendaftaran: '',
             tanggalDaftar: '',
         },
@@ -1510,6 +1548,7 @@ function ppdbForm() {
         formData: {
             namaLengkap: '',
             namaPanggilan: '',
+            nisn: '',
             nomorKK: '',
             tempatLahir: '',
             tanggalLahirHari: '',
@@ -1576,6 +1615,13 @@ function ppdbForm() {
                     if (!val || !val.trim()) this.errors.namaPanggilan = 'Nama panggilan wajib diisi.';
                     else delete this.errors.namaPanggilan;
                     break;
+                case 'nisn':
+                    if (val && val.trim() && val.trim().length !== 10) {
+                        this.errors.nisn = 'NISN harus 10 digit angka.';
+                    } else {
+                        delete this.errors.nisn;
+                    }
+                    break;
                 case 'tempatLahir':
                     if (!val || !val.trim()) this.errors.tempatLahir = 'Tempat lahir wajib diisi.';
                     else delete this.errors.tempatLahir;
@@ -1632,6 +1678,12 @@ function ppdbForm() {
                 }
             });
 
+            if (this.formData.nisn && this.formData.nisn.trim().length !== 10) {
+                this.errors.nisn = 'NISN harus 10 digit angka.';
+                this.touched.nisn = true;
+                isValid = false;
+            }
+
             return isValid;
         },
 
@@ -1676,10 +1728,11 @@ function ppdbForm() {
             this.isSubmittedAttempt = false;
             this.errors = {};
             this.touched = {};
-            this.submissionData = { noPendaftaran: '', tanggalDaftar: '' };
+            this.submissionData = { id: null, noPendaftaran: '', tanggalDaftar: '' };
             this.formData = {
                 namaLengkap: '',
                 namaPanggilan: '',
+                nisn: '',
                 nomorKK: '',
                 tempatLahir: '',
                 tanggalLahirHari: '',
@@ -1729,6 +1782,7 @@ function ppdbForm() {
 
                 if (response.ok && data.success) {
                     this.submissionData = {
+                        id: data.data?.id,
                         noPendaftaran: data.noPendaftaran,
                         tanggalDaftar: data.tanggalDaftar,
                     };

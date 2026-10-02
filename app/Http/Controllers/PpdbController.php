@@ -130,6 +130,7 @@ class PpdbController extends Controller
                 'data' => [
                     'id' => $registration->id,
                     'namaLengkap' => $registration->nama_lengkap,
+                    'nisn' => $registration->nisn,
                     'jurusan' => $registration->jurusan,
                     'asalSekolah' => $registration->asal_sekolah,
                     'jalurSeleksi' => $registration->jalur_seleksi,
@@ -208,28 +209,136 @@ class PpdbController extends Controller
     }
 
     /**
-     * Halaman Cek Status Pendaftar (Input NISN / Nomor Registrasi)
-     * GET /ppdb/cek-status
+     * Halaman & API Cek Status Pendaftar (Input NISN)
+     * GET|POST /ppdb/cek-status
      */
     public function cekStatus(Request $request)
     {
-        $query = $request->get('q') ?: $request->get('keyword');
+        $nisnInput = $request->input('nisn') ?? $request->input('keyword') ?? $request->input('q');
+        $cleanNisn = $nisnInput !== null ? trim((string) $nisnInput) : null;
+        $isJson = $request->wantsJson() || $request->ajax() || $request->header('Accept') === 'application/json';
+
+        // 1. Respon JSON untuk AJAX / Fetching API
+        if ($isJson) {
+            if (empty($cleanNisn)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silakan masukkan nomor NISN calon siswa.',
+                ], 422);
+            }
+
+            // Input harus NISN
+            $pendaftar = PpdbRegistration::with('gelombang')
+                ->where('nisn', $cleanNisn)
+                ->first();
+
+            // Toleransi jika user memasukkan nomor registrasi
+            if (! $pendaftar) {
+                $pendaftar = PpdbRegistration::with('gelombang')
+                    ->where('nomor_registrasi', $cleanNisn)
+                    ->first();
+            }
+
+            if (! $pendaftar) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Data pendaftar dengan NISN '{$cleanNisn}' tidak ditemukan di sistem PPDB.",
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $this->formatPendaftarData($pendaftar),
+            ]);
+        }
+
+        // 2. Respon Halaman Blade HTML
         $pendaftar = null;
         $searched = false;
 
-        if ($query) {
+        if (! empty($cleanNisn)) {
             $searched = true;
-            $cleanQuery = trim($query);
             $pendaftar = PpdbRegistration::with('gelombang')
-                ->where('nomor_registrasi', 'LIKE', "%{$cleanQuery}%")
-                ->orWhere('nisn', 'LIKE', "%{$cleanQuery}%")
-                ->orWhere('nomor_kk', 'LIKE', "%{$cleanQuery}%")
-                ->orWhere('nomor_kontak_pendaftar', 'LIKE', "%{$cleanQuery}%")
-                ->orWhere('nama_lengkap', 'LIKE', "%{$cleanQuery}%")
+                ->where('nisn', $cleanNisn)
+                ->orWhere('nomor_registrasi', $cleanNisn)
+                ->orWhere('nomor_registrasi', 'LIKE', "%{$cleanNisn}%")
                 ->first();
         }
 
-        return view('ppdb.cek-status', compact('pendaftar', 'query', 'searched'));
+        $serverPendaftar = $pendaftar ? $this->formatPendaftarData($pendaftar) : null;
+        $query = $cleanNisn;
+
+        return view('ppdb.cek-status', compact('pendaftar', 'serverPendaftar', 'query', 'searched'));
+    }
+
+    /**
+     * Format data record database pendaftar secara konsisten sesuai kolom DB
+     */
+    protected function formatPendaftarData(PpdbRegistration $pendaftar): array
+    {
+        $statusTypeMap = [
+            'lulus_seleksi' => 'success',
+            'terverifikasi' => 'info',
+            'tidak_lulus' => 'danger',
+            'menunggu_verifikasi' => 'warning',
+        ];
+
+        $keteranganMap = [
+            'lulus_seleksi' => 'Selamat! Anda dinyatakan LULUS SELEKSI penerimaan peserta didik baru SMK Plus Pelita Nusantara.',
+            'terverifikasi' => 'Berkas pendaftaran Anda telah berhasil DIVERIFIKASI oleh panitia seleKSI PPDB.',
+            'tidak_lulus' => 'Mohon maaf, Anda belum memenuhi kualifikasi seleksi PPDB pada periode ini.',
+            'menunggu_verifikasi' => 'Data pendaftaran Anda telah tercatat dan sedang dalam antrean verifikasi panitia.',
+        ];
+
+        $statusBadge = $pendaftar->status_badge;
+        $statusLabel = $statusBadge['label'] ?? strtoupper(str_replace('_', ' ', $pendaftar->status));
+
+        return [
+            'id' => $pendaftar->id,
+            'nomor_registrasi' => $pendaftar->nomor_registrasi,
+            'noPendaftaran' => $pendaftar->nomor_registrasi,
+            'nisn' => $pendaftar->nisn,
+            'nama_lengkap' => $pendaftar->nama_lengkap,
+            'namaLengkap' => $pendaftar->nama_lengkap,
+            'nama_panggilan' => $pendaftar->nama_panggilan,
+            'namaPanggilan' => $pendaftar->nama_panggilan,
+            'nomor_kk' => $pendaftar->nomor_kk,
+            'jenis_kelamin' => $pendaftar->jenis_kelamin,
+            'jenis_kelamin_label' => $pendaftar->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan',
+            'tempat_lahir' => $pendaftar->tempat_lahir,
+            'tanggal_lahir' => $pendaftar->tanggal_lahir_formatted,
+            'tanggal_lahir_hari' => $pendaftar->tanggal_lahir_hari,
+            'tanggal_lahir_bulan' => $pendaftar->tanggal_lahir_bulan,
+            'tanggal_lahir_tahun' => $pendaftar->tanggal_lahir_tahun,
+            'alamat_lengkap' => $pendaftar->alamat_lengkap,
+            'asal_sekolah' => $pendaftar->asal_sekolah,
+            'asalSekolah' => $pendaftar->asal_sekolah,
+            'kelas_pilihan' => $pendaftar->kelas_pilihan,
+            'kelasPilihan' => $pendaftar->kelas_pilihan,
+            'jurusan' => $pendaftar->jurusan,
+            'jalur_seleksi' => $pendaftar->jalur_seleksi,
+            'jalurSeleksi' => $pendaftar->jalur_seleksi,
+            'tipe_pendaftar' => $pendaftar->tipe_pendaftar,
+            'sekolah_pilihan_level' => $pendaftar->sekolah_pilihan_level,
+            'sekolah_pilihan_unit' => $pendaftar->sekolah_pilihan_unit,
+            'nomor_kontak_pendaftar' => $pendaftar->nomor_kontak_pendaftar,
+            'nomor_kontak_ortu' => $pendaftar->nomor_kontak_ortu,
+            'email' => $pendaftar->email,
+            'ukuran_seragam' => $pendaftar->ukuran_seragam,
+            'gelombang' => $pendaftar->gelombang?->nama ?? 'Gelombang 1',
+            'status' => $pendaftar->status,
+            'status_label' => $statusLabel,
+            'statusUtama' => strtoupper(str_replace('_', ' ', $pendaftar->status ?? 'menunggu_verifikasi')),
+            'status_type' => $statusTypeMap[$pendaftar->status] ?? 'warning',
+            'statusType' => $statusTypeMap[$pendaftar->status] ?? 'warning',
+            'keterangan_status' => $keteranganMap[$pendaftar->status] ?? 'Data pendaftaran Anda tercatat di sistem PPDB SMK Plus Pelita Nusantara.',
+            'keteranganStatus' => $keteranganMap[$pendaftar->status] ?? 'Data pendaftaran Anda tercatat di sistem PPDB SMK Plus Pelita Nusantara.',
+            'catatan' => $pendaftar->catatan,
+            'catatanPanitia' => $pendaftar->catatan,
+            'tanggal_daftar' => $pendaftar->created_at ? $pendaftar->created_at->format('d M Y') : 'Terdaftar',
+            'tanggalDaftar' => $pendaftar->created_at ? $pendaftar->created_at->format('d M Y') : 'Terdaftar',
+            'created_at' => $pendaftar->created_at?->toIso8601String(),
+        ];
     }
 
     /**

@@ -210,6 +210,50 @@ class PpdbBackendTest extends TestCase
     }
 
     /**
+     * Test public registration AJAX submission returns NISN in data
+     */
+    public function test_public_registration_ajax_submission_includes_nisn(): void
+    {
+        $payload = [
+            'namaLengkap' => 'Dewi Sartika Putri',
+            'namaPanggilan' => 'Dewi',
+            'nisn' => '0089123456',
+            'nomorKK' => '3201010101010002',
+            'tempatLahir' => 'Bogor',
+            'tanggalLahirHari' => '15',
+            'tanggalLahirBulan' => '08',
+            'tanggalLahirTahun' => '2010',
+            'jenisKelamin' => 'P',
+            'alamatLengkap' => 'Jl. Pajajaran No. 10',
+            'sekolahPilihanLevel' => 'SMK',
+            'sekolahPilihanUnit' => 'SMK Plus Pelita Nusantara Bogor',
+            'tipePendaftar' => 'Pendaftar Baru',
+            'kelasPilihan' => 'Reguler (Pagi)',
+            'jurusan' => 'Desain Komunikasi Visual (DKV)',
+            'jalurSeleksi' => 'Reguler',
+            'asalSekolah' => 'SMP Negeri 2 Cibinong',
+            'nomorKontakPendaftar' => '081234567892',
+            'nomorKontakOrtu' => '081234567893',
+        ];
+
+        $response = $this->postJson('/ppdb/daftar', $payload);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'namaLengkap' => 'Dewi Sartika Putri',
+                    'nisn' => '0089123456',
+                ],
+            ]);
+
+        $this->assertDatabaseHas('ppdb_registrations', [
+            'nama_lengkap' => 'Dewi Sartika Putri',
+            'nisn' => '0089123456',
+        ]);
+    }
+
+    /**
      * Test admin can update student registration status
      */
     public function test_admin_can_update_student_status(): void
@@ -343,5 +387,61 @@ class PpdbBackendTest extends TestCase
         $response = $this->get('/ppdb/cek-status?keyword='.urlencode($student->nomor_registrasi));
         $response->assertStatus(200);
         $response->assertSee($student->nama_lengkap);
+    }
+
+    /**
+     * Test fetching /ppdb/cek-status returns valid JSON for registered NISN
+     */
+    public function test_cek_status_json_returns_data_for_valid_nisn(): void
+    {
+        $student = PpdbRegistration::whereNotNull('nisn')->first();
+        $this->assertNotNull($student);
+
+        $response = $this->getJson('/ppdb/cek-status?nisn='.urlencode($student->nisn));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'data' => [
+                'id' => $student->id,
+                'nomor_registrasi' => $student->nomor_registrasi,
+                'nisn' => $student->nisn,
+                'nama_lengkap' => $student->nama_lengkap,
+                'jurusan' => $student->jurusan,
+                'status' => $student->status,
+            ],
+        ]);
+
+        // Verifikasi tidak ada field dummy
+        $json = $response->json();
+        $this->assertArrayNotHasKey('jadwalObservasi', $json['data']);
+        $this->assertArrayNotHasKey('rincianBiaya', $json['data']);
+        $this->assertArrayNotHasKey('tahapan', $json['data']);
+    }
+
+    /**
+     * Test fetching /ppdb/cek-status with nonexistent NISN returns 404
+     */
+    public function test_cek_status_json_returns_404_for_unknown_nisn(): void
+    {
+        $response = $this->getJson('/ppdb/cek-status?nisn=0000000000');
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'success' => false,
+        ]);
+    }
+
+    /**
+     * Test fetching /ppdb/cek-status with empty NISN returns 422
+     */
+    public function test_cek_status_json_returns_422_when_nisn_is_missing(): void
+    {
+        $response = $this->getJson('/ppdb/cek-status');
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'success' => false,
+        ]);
     }
 }
