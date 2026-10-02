@@ -17,13 +17,11 @@ class PpdbController extends Controller
      * Daftar 7 Kompetensi Keahlian SMK Plus Pelita Nusantara
      */
     protected array $majors = [
-        'Pengembangan Perangkat Lunak dan Gim (PPLG)' => 'PPLG',
-        'Teknik Jaringan Komputer dan Telekomunikasi (TJKT)' => 'TJKT',
-        'Desain Komunikasi Visual (DKV)' => 'DKV',
-        'Animasi' => 'Animasi',
-        'Broadcasting dan Perfilman (BC)' => 'Broadcasting',
-        'Akuntansi dan Keuangan Lembaga (AKL)' => 'AKL',
-        'Manajemen Perkantoran dan Layanan Bisnis (MPLB)' => 'MPLB',
+        'Rekayasa Perangkat Lunak' => 'RPL',
+        'Teknik Komputer Jaringan' => 'TKJ',
+        'Desain Komunikasi Visual' => 'DKV',
+        'Layanan Perbankan' => 'LPB',
+        'Teknik Otomasi Industri' => 'TOI',
     ];
 
     /**
