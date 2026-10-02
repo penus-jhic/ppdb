@@ -193,6 +193,7 @@ class PpdbController extends Controller
                 'isPinned' => (bool) $item->is_pinned,
                 'ringkasan' => $item->ringkasan ?? '',
                 'isiLengkap' => $item->isi_lengkap,
+                'isiLengkapHtml' => $item->isi_lengkap_html,
                 'fileAttachment' => $item->file_nama ? [
                     'nama' => $item->file_nama,
                     'ukuran' => $item->file_ukuran ?? 'PDF Dokumen',

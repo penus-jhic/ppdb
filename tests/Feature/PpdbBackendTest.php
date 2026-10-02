@@ -56,6 +56,26 @@ class PpdbBackendTest extends TestCase
     }
 
     /**
+     * Test pengumuman page renders isi_lengkap as markdown HTML
+     */
+    public function test_pengumuman_page_renders_isi_lengkap_markdown(): void
+    {
+        $announcement = PpdbAnnouncement::first();
+        $this->assertNotNull($announcement);
+        $this->assertNotEmpty($announcement->isi_lengkap_html);
+
+        $response = $this->get('/ppdb/pengumuman');
+        $response->assertStatus(200);
+        $response->assertViewHas('pengumumanList');
+
+        $list = $response->viewData('pengumumanList');
+        $this->assertIsArray($list);
+        $this->assertNotEmpty($list);
+        $this->assertArrayHasKey('isiLengkapHtml', $list[0]);
+        $this->assertStringContainsString('<', $list[0]['isiLengkapHtml']);
+    }
+
+    /**
      * Test printable card loads successfully for a student
      */
     public function test_cetak_kartu_is_accessible(): void
