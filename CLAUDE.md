@@ -1,6 +1,6 @@
 # PPDB SMK Plus Pelita Nusantara (Bogor) - Backend Documentation
 
-Aplikasi Penerimaan Peserta Didik Baru (PPDB) SMK Plus Pelita Nusantara berbasis Laravel 12 dengan frontend dinamis terintegrasi dan Admin Dashboard modern (Password-Only Authentication).
+Aplikasi Penerimaan Peserta Didik Baru (PPDB) SMK Plus Pelita Nusantara berbasis Laravel 12 dengan frontend dinamis terintegrasi dan Admin Dashboard modern (Auth Microservice JWT Authentication).
 
 ---
 
@@ -13,10 +13,9 @@ Admin Dashboard dilindungi melalui middleware `verify.auth` yang terintegrasi de
   AUTH_SERVICE_URL=http://localhost:3000
   ```
 - **Mekanisme Otentikasi**:
-  Token JWT `access_token` dapat dikirimkan melalui 3 saluran:
+  Token JWT `access_token` dikirimkan melalui 2 saluran resmi (query parameter dilarang demi keamanan CWE-598):
   1. Header `Authorization: Bearer <token>`
   2. HTTP Cookie `access_token` (dikecualikan dari enkripsi cookie Laravel)
-  3. Request Body / Query Param `access_token`
 - **Role-Based Access Control (RBAC)**:
   Rute `/ppdb/dashboard/*` membatasi akses hanya untuk peran:
   `verify.auth:ADMIN,KEPALA_SEKOLAH,TU,DEVELOPER`

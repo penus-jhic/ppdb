@@ -26,7 +26,6 @@
                 $isAkomodasi = request()->routeIs('ppdb.akomodasi') || request()->is('ppdb/akomodasi*') || request()->is('akomodasi*');
                 $isCekStatus = request()->routeIs('ppdb.cek-status') || request()->is('ppdb/cek-status*') || request()->is('cek-status*');
                 $isPengumuman = request()->routeIs('ppdb.pengumuman') || request()->is('ppdb/pengumuman*') || request()->is('pengumuman*');
-                $isDashboard = request()->routeIs('ppdb.dashboard') || request()->is('ppdb/dashboard*') || request()->is('dashboard*');
             @endphp
 
             <!-- 1. Beranda / Form Pendaftaran -->
@@ -66,16 +65,6 @@
                     class="block px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 {{ $isPengumuman ? 'bg-brand-darkred/10 text-brand-darkred shadow-2xs' : 'text-brand-ink/80 hover:text-brand-darkred hover:bg-black/5' }}"
                 >
                     Pengumuman
-                </a>
-            </li>
-
-            <!-- 5. Dashboard Rekap -->
-            <li>
-                <a 
-                    href="{{ route('ppdb.dashboard') }}"
-                    class="block px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 {{ $isDashboard ? 'bg-brand-darkred/10 text-brand-darkred shadow-2xs' : 'text-brand-ink/80 hover:text-brand-darkred hover:bg-black/5' }}"
-                >
-                    Dashboard
                 </a>
             </li>
         </ul>
@@ -190,16 +179,6 @@
                 class="flex items-center justify-between px-4 py-3 rounded-2xl text-base font-semibold transition-colors {{ $isPengumuman ? 'bg-white/15 text-white' : 'text-brand-mist hover:bg-white/10 hover:text-white' }}"
             >
                 <span>Pengumuman Hasil Seleksi</span>
-                <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </a>
-
-            <!-- 5. Dashboard -->
-            <a 
-                href="{{ route('ppdb.dashboard') }}"
-                @click="mobileOpen = false"
-                class="flex items-center justify-between px-4 py-3 rounded-2xl text-base font-semibold transition-colors {{ $isDashboard ? 'bg-white/15 text-white' : 'text-brand-mist hover:bg-white/10 hover:text-white' }}"
-            >
-                <span>Dashboard Rekapitulasi</span>
                 <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
