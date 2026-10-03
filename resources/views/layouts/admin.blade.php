@@ -452,7 +452,9 @@
                                 </path>
                             </svg>
                             <!-- Notification Red Dot -->
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#8B1D24]"></span>
+                            @if(($unverifiedCount ?? 0) > 0)
+                                <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#8B1D24] ring-2 ring-white animate-pulse"></span>
+                            @endif
                         </button>
 
                         <!-- Notification Dropdown -->
@@ -464,20 +466,31 @@
                             <div
                                 class="font-bold border-b border-slate-100 pb-2.5 mb-2.5 flex items-center justify-between text-slate-900">
                                 <span>Notifikasi PPDB</span>
-                                <span
-                                    class="text-[10px] text-[#8B1D24] bg-red-50 px-2 py-0.5 rounded-full font-bold uppercase">Live</span>
+                                @if(($unverifiedCount ?? 0) > 0)
+                                    <span class="text-[10px] text-[#8B1D24] bg-red-50 px-2 py-0.5 rounded-full font-bold uppercase">{{ $unverifiedCount }} Menunggu</span>
+                                @else
+                                    <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold uppercase">Terverifikasi</span>
+                                @endif
                             </div>
-                            <div class="space-y-2">
-                                <div class="p-2.5 rounded-xl bg-red-50/60 border border-red-100">
-                                    <p class="font-bold text-[11px] text-[#8B1D24]">Pendaftar Baru Masuk</p>
-                                    <p class="text-[11px] text-slate-600 mt-0.5">Pendaftar baru siap untuk diverifikasi
-                                        oleh panitia.</p>
-                                </div>
-                                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                                    <p class="font-bold text-[11px] text-slate-800">T.A 2027/2028 Aktif</p>
-                                    <p class="text-[11px] text-slate-600 mt-0.5">Penerimaan calon siswa baru jalur
-                                        reguler & prestasi dibuka.</p>
-                                </div>
+                            <div class="space-y-2 max-h-72 overflow-y-auto">
+                                @forelse($recentRegistrations ?? [] as $reg)
+                                    <a href="{{ route('ppdb.dashboard.pendaftar.detail', $reg->id) }}" class="block p-2.5 rounded-xl hover:bg-slate-50 transition-colors {{ $reg->status === 'menunggu_verifikasi' ? 'bg-red-50/60 border border-red-100' : 'bg-slate-50/80 border border-slate-100' }}">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <p class="font-bold text-[11px] text-slate-900 truncate">{{ $reg->nama_lengkap }}</p>
+                                            <span class="text-[9px] text-slate-400 shrink-0 font-medium">{{ $reg->created_at ? $reg->created_at->diffForHumans() : '-' }}</span>
+                                        </div>
+                                        <p class="text-[10px] text-slate-500 mt-0.5 truncate">{{ $reg->jurusan }} • {{ $reg->nomor_registrasi }}</p>
+                                    </a>
+                                @empty
+                                    <div class="p-3 text-center text-slate-400 text-[11px]">
+                                        Belum ada pendaftaran baru.
+                                    </div>
+                                @endforelse
+                            </div>
+                            <div class="pt-2 border-t border-slate-100 mt-2 text-center">
+                                <a href="{{ route('ppdb.dashboard.pendaftar') }}" class="text-[11px] font-bold text-[#8B1D24] hover:underline">
+                                    Lihat Seluruh Pendaftar →
+                                </a>
                             </div>
                         </div>
                     </div>

@@ -247,45 +247,50 @@
 
                             <div x-show="isJadwalOpen" x-transition.opacity
                                 class="divide-y divide-brand-ink/10 mt-3 animate-fade-in">
-                                <div class="py-3.5 space-y-1.5 first:pt-1">
+                                @forelse($waves ?? [] as $wave)
+                                <div class="py-3.5 space-y-1.5 first:pt-1 last:pb-0">
                                     <div class="flex items-start justify-between gap-3">
-                                        <h4 class="font-sans font-bold text-sm text-brand-ink leading-snug">
-                                            SMK Plus Pelita Nusantara Bogor 2027/2028
-                                        </h4>
-                                        <span
-                                            class="text-[10px] font-bold text-white px-2.5 py-0.5 rounded-full shrink-0 uppercase tracking-wider bg-brand-darkred">
-                                            normal
+                                        <div>
+                                            <h4 class="font-sans font-bold text-sm text-brand-ink leading-snug">
+                                                {{ $wave->nama }} (T.A {{ $wave->tahun_ajaran }})
+                                            </h4>
+                                            @if($wave->deskripsi)
+                                                <p class="text-[11px] text-brand-ink/60 line-clamp-1 mt-0.5">{{ $wave->deskripsi }}</p>
+                                            @endif
+                                        </div>
+                                        @if($wave->is_active)
+                                            <span class="text-[10px] font-bold text-white px-2.5 py-0.5 rounded-full shrink-0 uppercase tracking-wider bg-emerald-600">
+                                                Buka
+                                            </span>
+                                        @elseif($wave->tanggal_mulai && $wave->tanggal_mulai->isFuture())
+                                            <span class="text-[10px] font-bold text-white px-2.5 py-0.5 rounded-full shrink-0 uppercase tracking-wider bg-brand-signal">
+                                                Segera
+                                            </span>
+                                        @else
+                                            <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-2.5 py-0.5 rounded-full shrink-0 uppercase tracking-wider">
+                                                Tutup
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs text-brand-ink/70 font-medium pt-0.5">
+                                        <div class="flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-brand-darkred shrink-0" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>{{ $wave->periode_formatted }}</span>
+                                        </div>
+                                        <span class="text-[11px] font-semibold text-brand-darkred">
+                                            {{ $wave->biaya_formulir_formatted }}
                                         </span>
                                     </div>
-                                    <div class="flex items-center gap-1.5 text-xs text-brand-ink/70 font-medium">
-                                        <svg class="w-3.5 h-3.5 text-brand-darkred shrink-0" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>15 September 2026 – 30 September 2028</span>
-                                    </div>
                                 </div>
-
-                                <div class="py-3.5 space-y-1.5 last:pb-0">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <h4 class="font-sans font-bold text-sm text-brand-ink leading-snug">
-                                            SMK Plus Pelita Nusantara Bogor 2026/2027
-                                        </h4>
-                                        <span
-                                            class="text-[10px] font-bold text-white px-2.5 py-0.5 rounded-full shrink-0 uppercase tracking-wider bg-brand-signal">
-                                            pindahan
-                                        </span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 text-xs text-brand-ink/70 font-medium">
-                                        <svg class="w-3.5 h-3.5 text-brand-darkred shrink-0" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>01 Agustus 2026 – 21 Juni 2027</span>
-                                    </div>
+                                @empty
+                                <div class="py-4 text-xs text-brand-ink/60 text-center">
+                                    Jadwal gelombang pendaftaran belum dikonfigurasi.
                                 </div>
+                                @endforelse
                             </div>
                         </div>
 
@@ -342,8 +347,8 @@
                                     <div class="text-xs text-brand-ink/80 leading-relaxed">
                                         Jika ada hal-hal yang ingin ditanyakan mengenai proses pendaftaran silahkan
                                         hubungi
-                                        <a href="https://wa.me/6281210868958" target="_blank"
-                                            class="font-bold text-brand-darkred hover:underline">+62 812-1086-8958</a>
+                                        <a href="https://wa.me/{{ $kontakWa }}" target="_blank"
+                                            class="font-bold text-brand-darkred hover:underline">{{ $kontakWaFormatted }}</a>
                                     </div>
                                 </div>
                                 <div class="py-3 flex items-start gap-3">
@@ -399,7 +404,7 @@
                                 Butuh panduan pengisian formulir? Tim sekretariat PPDB siap membantu melalui kontak
                                 hotline resmi.
                             </p>
-                            <a href="https://wa.me/6281210868958" target="_blank" rel="noreferrer"
+                            <a href="https://wa.me/{{ $kontakWa }}" target="_blank" rel="noreferrer"
                                 class="w-full py-2.5 text-xs font-bold inline-flex items-center justify-center gap-2 bg-linear-to-r from-brand-signal to-brand-darkred hover:opacity-95 text-white px-7 rounded-full shadow-md shadow-brand-darkred/25 transition-all active:scale-[0.98] cursor-pointer">
                                 Chat CS WhatsApp PPDB
                             </a>
@@ -1189,9 +1194,9 @@
                                             <p class="mt-1 text-xs text-brand-ink/70">
                                                 Untuk pertanyaan seputar proses seleksi, hubungi hotline resmi panitia
                                                 di
-                                                <a href="https://wa.me/6281210868958" target="_blank" rel="noreferrer"
+                                                <a href="https://wa.me/{{ $kontakWa }}" target="_blank" rel="noreferrer"
                                                     class="text-brand-darkred font-bold underline hover:text-brand-deepred">
-                                                    0812-1086-8958
+                                                    {{ $kontakWaFormatted }}
                                                 </a>
                                             </p>
                                         </div>
@@ -1629,8 +1634,8 @@
                         class="w-5 h-5 rounded-full bg-brand-softmist text-brand-darkred text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
                     <div class="text-xs sm:text-sm text-brand-ink/80 leading-relaxed">
                         Jika ada hal-hal yang ingin ditanyakan mengenai proses pendaftaran silahkan hubungi
-                        <a href="https://wa.me/6281210868958" target="_blank"
-                            class="font-bold text-brand-darkred hover:underline">+62 812-1086-8958</a>
+                        <a href="https://wa.me/{{ $kontakWa }}" target="_blank"
+                            class="font-bold text-brand-darkred hover:underline">{{ $kontakWaFormatted }}</a>
                     </div>
                 </div>
                 <div class="py-3 flex items-start gap-3">

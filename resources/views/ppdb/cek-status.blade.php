@@ -224,7 +224,7 @@
                         Jika data Anda belum sesuai atau butuh bantuan verifikasi berkas, hubungi sekretariat PPDB melalui WhatsApp:
                     </p>
                     <a
-                        href="https://wa.me/6281210868958?text=Halo%20Panitia%20PPDB,%20saya%20ingin%20menanyakan%20status%20pendaftaran%20NISN"
+                        href="https://wa.me/{{ $kontakWa }}?text=Halo%20Panitia%20PPDB,%20saya%20ingin%20menanyakan%20status%20pendaftaran%20NISN"
                         target="_blank"
                         rel="noreferrer"
                         class="w-full py-2.5 rounded-full bg-[#B72A32] hover:bg-[#7A1018] text-white text-xs font-bold inline-flex items-center justify-center gap-2"
@@ -269,7 +269,7 @@
                             <span>Cari Ulang</span>
                         </button>
                         <a
-                            href="https://wa.me/6281210868958"
+                            href="https://wa.me/{{ $kontakWa }}"
                             target="_blank"
                             rel="noreferrer"
                             class="py-2 px-5 rounded-full bg-[#B72A32] hover:bg-[#7A1018] text-white text-xs font-bold inline-flex items-center gap-1.5"

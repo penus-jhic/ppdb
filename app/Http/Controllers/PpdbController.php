@@ -31,10 +31,11 @@ class PpdbController extends Controller
     public function index()
     {
         $activeWave = PpdbWave::where('is_active', true)->first() ?? PpdbWave::first();
+        $waves = PpdbWave::orderBy('tanggal_mulai')->get();
         $totalPendaftar = PpdbRegistration::count();
         $majors = $this->majors;
 
-        return view('ppdb.index', compact('activeWave', 'totalPendaftar', 'majors'));
+        return view('ppdb.index', compact('activeWave', 'waves', 'totalPendaftar', 'majors'));
     }
 
     /**
@@ -149,12 +150,18 @@ class PpdbController extends Controller
      */
     public function akomodasi()
     {
-        $activeWave = PpdbWave::where('is_active', true)->first();
+        $activeWave = PpdbWave::where('is_active', true)->first() ?? PpdbWave::first();
         $kontakWa = PpdbFeeSetting::get('kontak_wa', '6281283921029');
         $rekeningList = PpdbFeeSetting::get('daftar_rekening', []);
         $biayaFormulir = PpdbFeeSetting::get('biaya_formulir', 150000);
         $dspCash = PpdbFeeSetting::get('dsp_cash', 5850000);
+        $dspAngsuran1 = PpdbFeeSetting::get('dsp_angsuran_1', 2500000);
+        $dspAngsuran2 = PpdbFeeSetting::get('dsp_angsuran_2', 1850000);
+        $dspAngsuran3 = PpdbFeeSetting::get('dsp_angsuran_3', 1500000);
         $sppBulanan = PpdbFeeSetting::get('spp_bulanan', 450000);
+        $biayaSeragam = PpdbFeeSetting::get('biaya_seragam', 1975000);
+        $potonganGelombang1 = PpdbFeeSetting::get('potongan_gelombang_1', 500000);
+        $majors = $this->majors;
 
         return view('ppdb.akomodasi', compact(
             'activeWave',
@@ -162,7 +169,13 @@ class PpdbController extends Controller
             'rekeningList',
             'biayaFormulir',
             'dspCash',
-            'sppBulanan'
+            'dspAngsuran1',
+            'dspAngsuran2',
+            'dspAngsuran3',
+            'sppBulanan',
+            'biayaSeragam',
+            'potonganGelombang1',
+            'majors'
         ));
     }
 

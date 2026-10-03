@@ -12,10 +12,19 @@
         nisn: '',
         noHpWa: '',
         jurusanMinat: 'Rekayasa Perangkat Lunak (RPL)',
-        rencanaPembayaran: 'Cash Lunas (Rp 5.850.000)',
+        rencanaPembayaran: 'Cash Lunas (Rp {{ number_format($dspCash ?? 5850000, 0, ',', '.') }})',
         catatan: ''
     },
     formErrors: {},
+    copiedRekening: null,
+    copyRekening(nomor) {
+        if (!nomor) return;
+        navigator.clipboard.writeText(nomor);
+        this.copiedRekening = nomor;
+        setTimeout(() => {
+            this.copiedRekening = null;
+        }, 2000);
+    },
     toggleFaq(id) {
         this.openFaqId = this.openFaqId === id ? null : id;
     },
@@ -50,7 +59,7 @@
     handleSendToWhatsApp() {
         const text = encodeURIComponent(
             `Halo Panitia PPDB SMK Plus Pelita Nusantara,\n\n` +
-            `Saya ingin berkonsultasi mengenai pembiayaan & pendaftaran PPDB 2024/2025:\n` +
+            `Saya ingin berkonsultasi mengenai pembiayaan & pendaftaran PPDB {{ $activeWave?->tahun_ajaran ?? '2027/2028' }}:\n` +
             `• Nama Siswa: ${this.konsultasiForm.namaLengkap}\n` +
             `• NISN: ${this.konsultasiForm.nisn || '-'}\n` +
             `• No. WA: ${this.konsultasiForm.noHpWa}\n` +
@@ -76,7 +85,7 @@
                 <div class="flex flex-wrap items-center gap-2 mb-3">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-semibold border border-white/15">
                         <span class="w-1.5 h-1.5 rounded-full bg-[#E5A823]"></span>
-                        Tahun Ajaran 2024/2025
+                        Tahun Ajaran {{ $activeWave?->tahun_ajaran ?? '2027/2028' }}
                     </span>
                     <span class="text-xs text-white/50 hidden sm:inline">•</span>
                     <span class="text-xs text-white/80 font-medium hidden sm:inline">
@@ -89,7 +98,7 @@
                 </h1>
 
                 <p class="mt-3.5 text-white/80 text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-normal">
-                    Transparansi uraian pembiayaan pendidikan, seragam & atribut lengkap, 4 kompetensi keahlian unggulan, program pembinaan karakter, dan prestasi siswa SMK Plus Pelita Nusantara.
+                    Transparansi uraian pembiayaan pendidikan, seragam & atribut lengkap, 5 kompetensi keahlian unggulan, program pembinaan karakter, dan prestasi siswa SMK Plus Pelita Nusantara.
                 </p>
 
                 <div class="mt-6 flex flex-wrap items-center gap-3">
@@ -147,7 +156,7 @@
                 </span>
                 <div class="my-1 sm:my-1.5">
                     <span class="text-xl sm:text-2xl lg:text-3xl font-bold text-brand-ink font-display tracking-wide">
-                        Rp 5.850.000
+                        Rp {{ number_format($dspCash ?? 5850000, 0, ',', '.') }}
                     </span>
                 </div>
                 <span class="text-[11px] sm:text-xs text-brand-ink/65 font-medium leading-snug">
@@ -161,11 +170,11 @@
                 </span>
                 <div class="my-1 sm:my-1.5">
                     <span class="text-xl sm:text-2xl lg:text-3xl font-bold text-brand-darkred font-display tracking-wide">
-                        Rp 3.875.000
+                        Rp {{ number_format(max(0, ($dspCash ?? 5850000) - ($biayaSeragam ?? 1975000)), 0, ',', '.') }}
                     </span>
                 </div>
                 <span class="text-[11px] sm:text-xs text-brand-ink/65 font-medium leading-snug">
-                    Termasuk SPP Juli & Pelatihan Karakter
+                    Termasuk SPP Bulan Pertama & Pelatihan Karakter
                 </span>
             </div>
 
@@ -175,7 +184,7 @@
                 </span>
                 <div class="my-1 sm:my-1.5">
                     <span class="text-xl sm:text-2xl lg:text-3xl font-bold text-brand-ink font-display tracking-wide">
-                        13 Item Lengkap
+                        Rp {{ number_format($biayaSeragam ?? 1975000, 0, ',', '.') }}
                     </span>
                 </div>
                 <span class="text-[11px] sm:text-xs text-brand-ink/65 font-medium leading-snug">
@@ -207,30 +216,30 @@
             
             <!-- LEFT COLUMN: Sticky Sidebar Cards -->
             <aside class="lg:col-span-4 space-y-5 order-2 lg:order-1">
-                <!-- Card: Ringkasan Total & Rekening Pembayaran -->
+                <!-- Card: Ringkasan Total Skema Cash -->
                 <div class="bg-white rounded-card p-5 sm:p-6 shadow-softpill border border-brand-ink/10 space-y-3.5">
                     <div class="flex items-center justify-between pb-3 border-b border-brand-ink/10">
                         <span class="font-editorial-eyebrow text-brand-darkred text-xs uppercase font-bold">
                             SKEMA RESMI CASH
                         </span>
                         <span class="bg-[#E5A823]/20 text-[#8B5E00] px-2.5 py-0.5 rounded-full text-[10px] font-bold">
-                            2024/2025
+                            {{ $activeWave?->tahun_ajaran ?? '2027/2028' }}
                         </span>
                     </div>
 
                     <div class="space-y-2 text-xs">
                         <div class="flex justify-between items-center text-brand-ink/75">
                             <span>Uraian PPDB (6 Item):</span>
-                            <span class="font-bold text-brand-ink">Rp. 3.875.000,-</span>
+                            <span class="font-bold text-brand-ink">Rp. {{ number_format(max(0, ($dspCash ?? 5850000) - ($biayaSeragam ?? 1975000)), 0, ',', '.') }},-</span>
                         </div>
                         <div class="flex justify-between items-center text-brand-ink/75">
                             <span>Seragam & Atribut (13 Item):</span>
-                            <span class="font-bold text-brand-ink">Rp. 1.975.000,-</span>
+                            <span class="font-bold text-brand-ink">Rp. {{ number_format($biayaSeragam ?? 1975000, 0, ',', '.') }},-</span>
                         </div>
                         <div class="pt-2 border-t border-dashed border-brand-ink/20 flex justify-between items-baseline">
                             <span class="font-bold text-sm text-brand-ink">Total Biaya Masuk:</span>
                             <span class="font-black text-lg text-brand-darkred font-sans">
-                                Rp. 5.850.000,-
+                                Rp. {{ number_format($dspCash ?? 5850000, 0, ',', '.') }},-
                             </span>
                         </div>
                     </div>
@@ -244,6 +253,66 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             <span>Ajukan Konsultasi / Cicilan</span>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Rekening Resmi Pembayaran Yayasan (STL-02) -->
+                <div class="bg-white rounded-card p-5 sm:p-6 shadow-softpill border border-brand-ink/10 space-y-3.5">
+                    <div class="flex items-center justify-between pb-3 border-b border-brand-ink/10">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="font-editorial-eyebrow text-brand-darkred text-xs uppercase font-bold">
+                                REKENING RESMI
+                            </span>
+                        </div>
+                        <span class="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+                            Terverifikasi
+                        </span>
+                    </div>
+
+                    <p class="text-xs text-brand-ink/70 leading-relaxed">
+                        Pembayaran transfer resmi hanya dilakukan melalui nomor rekening yayasan berikut:
+                    </p>
+
+                    <div class="space-y-2.5">
+                        @forelse($rekeningList as $rek)
+                        <div class="p-3 rounded-xl bg-[#F9F8F6] border border-brand-ink/10 hover:border-brand-darkred/30 transition-all space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-xs text-brand-ink">{{ $rek['bank'] ?? 'Bank Resmi' }}</span>
+                                @if(!empty($rek['badge']))
+                                    <span class="text-[10px] font-semibold bg-brand-darkred/10 text-brand-darkred px-2 py-0.5 rounded-full">
+                                        {{ $rek['badge'] }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="flex items-center justify-between gap-2 bg-white px-2.5 py-1.5 rounded-lg border border-brand-ink/10">
+                                <span class="font-mono font-bold text-xs sm:text-sm text-brand-darkred tracking-wider select-all">
+                                    {{ $rek['nomor'] ?? '-' }}
+                                </span>
+                                <button
+                                    type="button"
+                                    @click="copyRekening('{{ $rek['nomor'] ?? '' }}')"
+                                    class="shrink-0 px-2 py-1 text-brand-ink/60 hover:text-brand-darkred hover:bg-brand-softmist/60 rounded text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer"
+                                    title="Salin Nomor Rekening"
+                                >
+                                    <span x-show="copiedRekening === '{{ $rek['nomor'] ?? '' }}'" class="text-[10px] font-bold text-emerald-600">Tersalin!</span>
+                                    <span x-show="copiedRekening !== '{{ $rek['nomor'] ?? '' }}'">Salin</span>
+                                    <svg x-show="copiedRekening !== '{{ $rek['nomor'] ?? '' }}'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                </button>
+                            </div>
+                            <div class="text-[11px] text-brand-ink/60">
+                                a.n. <strong class="text-brand-ink/80">{{ $rek['atas_nama'] ?? 'SMK Plus Pelita Nusantara' }}</strong>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+                            Silakan hubungi loket panitia atau panitia PPDB untuk konfirmasi nomor rekening transfer resmi.
+                        </div>
+                        @endforelse
+                    </div>
+
+                    <div class="pt-1 text-[11px] text-brand-ink/50 italic leading-snug">
+                        * Wajib simpan & konfirmasi bukti transfer ke panitia melalui WhatsApp.
                     </div>
                 </div>
 
@@ -280,7 +349,7 @@
                         Ada pertanyaan tentang rincian pembayaran, beasiswa, atau jadwal pengambilan seragam?
                     </p>
                     <a
-                        href="https://wa.me/6281210868958?text=Halo%20Panitia%20PPDB%20Penus,%20saya%20ingin%20tanya%20mengenai%20rincian%20pembiayaan"
+                        href="https://wa.me/{{ $kontakWa ?? '6281283921029' }}?text=Halo%20Panitia%20PPDB%20Penus,%20saya%20ingin%20tanya%20mengenai%20rincian%20pembiayaan"
                         target="_blank"
                         rel="noreferrer"
                         class="w-full py-2.5 rounded-full bg-[#B72A32] hover:bg-[#7A1018] text-white text-xs font-bold shadow-softpill flex items-center justify-center gap-2"
@@ -339,6 +408,16 @@
                             </h3>
                         </div>
 
+                        @php
+                            $calcBiayaSeragam = (int) ($biayaSeragam ?? 1975000);
+                            $calcDspCash = (int) ($dspCash ?? 5850000);
+                            $calcSppBulanan = (int) ($sppBulanan ?? 450000);
+                            $calcBiayaPendidikan = max(0, $calcDspCash - $calcBiayaSeragam);
+                            $calcFixedBiaya = 500000;
+                            $calcDanaPembangunan = max(0, $calcBiayaPendidikan - $calcSppBulanan - $calcFixedBiaya);
+                            $tahunAjaranAwal = substr($activeWave?->tahun_ajaran ?? '2027/2028', 0, 4);
+                        @endphp
+
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
@@ -355,15 +434,15 @@
                                             <div>Dana Pembangunan Pendidikan</div>
                                             <div class="text-[11px] text-brand-ink/55 font-normal mt-0.5">Pengembangan sarana & laboratorium kejuruan terpadu</div>
                                         </td>
-                                        <td class="py-3 sm:py-3.5 px-4 sm:px-6 text-right font-bold text-brand-ink font-sans whitespace-nowrap">Rp. 3.000.000,-</td>
+                                        <td class="py-3 sm:py-3.5 px-4 sm:px-6 text-right font-bold text-brand-ink font-sans whitespace-nowrap">Rp. {{ number_format($calcDanaPembangunan, 0, ',', '.') }},-</td>
                                     </tr>
                                     <tr class="hover:bg-brand-softmist/40 transition-colors">
                                         <td class="py-3 sm:py-3.5 px-4 text-center font-bold text-brand-darkred bg-[#F9F8F6] border-r border-brand-ink/10">2.</td>
                                         <td class="py-3 sm:py-3.5 px-4 sm:px-6 font-semibold text-brand-ink border-r border-brand-ink/10">
-                                            <div>SPP Bulan Juli 2023</div>
+                                            <div>SPP Bulan Pertama (Juli {{ $tahunAjaranAwal }})</div>
                                             <div class="text-[11px] text-brand-ink/55 font-normal mt-0.5">Iuran operasional pendidikan bulan pertama masuk</div>
                                         </td>
-                                        <td class="py-3 sm:py-3.5 px-4 sm:px-6 text-right font-bold text-brand-ink font-sans whitespace-nowrap">Rp. 375.000,-</td>
+                                        <td class="py-3 sm:py-3.5 px-4 sm:px-6 text-right font-bold text-brand-ink font-sans whitespace-nowrap">Rp. {{ number_format($calcSppBulanan, 0, ',', '.') }},-</td>
                                     </tr>
                                     <tr class="hover:bg-brand-softmist/40 transition-colors">
                                         <td class="py-3 sm:py-3.5 px-4 text-center font-bold text-brand-darkred bg-[#F9F8F6] border-r border-brand-ink/10">3.</td>
@@ -404,7 +483,7 @@
                                             JUMLAH
                                         </td>
                                         <td class="py-3.5 px-4 sm:px-6 text-right font-sans tracking-wide whitespace-nowrap">
-                                            Rp. 3.875.000,-
+                                            Rp. {{ number_format($calcBiayaPendidikan, 0, ',', '.') }},-
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -544,7 +623,7 @@
                                             JUMLAH
                                         </td>
                                         <td class="py-3 px-4 sm:px-6 text-right font-sans tracking-wide whitespace-nowrap">
-                                            Rp. 1.975.000,-
+                                            Rp. {{ number_format($calcBiayaSeragam, 0, ',', '.') }},-
                                         </td>
                                     </tr>
                                     <tr class="bg-[#E5A823] text-[#1A1D20] font-black text-sm sm:text-base border-t-2 border-[#C88E12]">
@@ -552,7 +631,7 @@
                                             TOTAL PEMBIAYAAN
                                         </td>
                                         <td class="py-4 px-4 sm:px-6 text-right font-sans tracking-tight text-base sm:text-lg whitespace-nowrap text-[#5C0B12]">
-                                            Rp. 5.850.000,-
+                                            Rp. {{ number_format($calcDspCash, 0, ',', '.') }},-
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -574,7 +653,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION 3: 4 KOMPETENSI KEAHLIAN (JURUSAN) -->
+                <!-- SECTION 3: 5 KOMPETENSI KEAHLIAN (JURUSAN) -->
                 <div id="jurusan" class="space-y-5 pt-4">
                     <div class="flex items-center gap-3 border-b border-brand-ink/10 pb-3">
                         <div class="w-8 h-8 rounded-full bg-brand-darkred text-white flex items-center justify-center font-bold text-xs shrink-0">
@@ -585,12 +664,13 @@
                                 PILIHAN JURUSAN UNGGULAN
                             </span>
                             <h2 class="font-editorial-h3 text-brand-ink font-bold text-xl sm:text-2xl">
-                                4 Kompetensi Keahlian
+                                5 Kompetensi Keahlian
                             </h2>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- 1. RPL -->
                         <div class="bg-white rounded-card p-5 sm:p-6 shadow-softpill border border-brand-ink/10 flex flex-col justify-between hover:shadow-softpill hover:-translate-y-1 transition-all duration-300 group">
                             <div class="space-y-2.5">
                                 <div class="flex items-center justify-between">
@@ -601,17 +681,18 @@
                                     Rekayasa Perangkat Lunak
                                 </h3>
                                 <p class="text-xs text-brand-ink/75 leading-relaxed">
-                                    Fokus pada pengembangan aplikasi web, software desktop, mobile programming, database, dan gim digital berstandar industri modern.
+                                    Fokus pada pengembangan aplikasi web, software enterprise, mobile apps, database, dan gim digital berstandar industri modern.
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-brand-ink/10 flex items-center justify-between text-xs">
-                                <span class="font-semibold text-brand-darkred text-[11px]">★ Kerjasama Devaccto IT & Peluang Kerja Tinggi</span>
+                                <span class="font-semibold text-brand-darkred text-[11px]">★ Kerjasama Devaccto IT & Industri Game</span>
                                 <button type="button" @click="handleOpenKonsultasi('Rekayasa Perangkat Lunak (RPL)')" class="text-brand-ink/70 hover:text-brand-darkred font-bold text-[11px] underline underline-offset-2 cursor-pointer">
                                     Pilih Jurusan
                                 </button>
                             </div>
                         </div>
 
+                        <!-- 2. TKJ -->
                         <div class="bg-white rounded-card p-5 sm:p-6 shadow-softpill border border-brand-ink/10 flex flex-col justify-between hover:shadow-softpill hover:-translate-y-1 transition-all duration-300 group">
                             <div class="space-y-2.5">
                                 <div class="flex items-center justify-between">
@@ -622,7 +703,7 @@
                                     Teknik Komputer dan Jaringan
                                 </h3>
                                 <p class="text-xs text-brand-ink/75 leading-relaxed">
-                                    Penguasaan infrastruktur jaringan, konfigurasi server, cloud computing, fiber optic, dan keamanan sistem komputer berlisensi resmi.
+                                    Penguasaan infrastruktur jaringan, server administration, cloud computing, fiber optik, dan keamanan jaringan siber.
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-brand-ink/10 flex items-center justify-between text-xs">
@@ -633,43 +714,67 @@
                             </div>
                         </div>
 
+                        <!-- 3. DKV -->
                         <div class="bg-white rounded-card p-5 sm:p-6 shadow-softpill border border-brand-ink/10 flex flex-col justify-between hover:shadow-softpill hover:-translate-y-1 transition-all duration-300 group">
                             <div class="space-y-2.5">
                                 <div class="flex items-center justify-between">
-                                    <span class="bg-brand-darkred text-white font-bold text-xs px-3 py-1 rounded-full shadow-xs">MM</span>
-                                    <span class="text-[11px] font-bold text-brand-darkred font-mono">DKV / MM</span>
+                                    <span class="bg-brand-darkred text-white font-bold text-xs px-3 py-1 rounded-full shadow-xs">DKV</span>
+                                    <span class="text-[11px] font-bold text-brand-darkred font-mono">DKV / Visual</span>
                                 </div>
                                 <h3 class="font-display font-bold uppercase tracking-wide text-base sm:text-lg text-brand-ink group-hover:text-brand-darkred transition-colors">
-                                    Multimedia
+                                    Desain Komunikasi Visual
                                 </h3>
                                 <p class="text-xs text-brand-ink/75 leading-relaxed">
-                                    Keahlian desain grafis, animasi 2D/3D, audio-video editing, fotografi, dan produksi konten digital kreatif berdaya saing.
+                                    Keahlian desain grafis, animasi 2D/3D, audio-video editing, fotografi, ilustrasi digital, dan UI/UX kreatif berdaya saing global.
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-brand-ink/10 flex items-center justify-between text-xs">
-                                <span class="font-semibold text-brand-darkred text-[11px]">★ Lab Multimedia & Broadcasting Lengkap</span>
-                                <button type="button" @click="handleOpenKonsultasi('Multimedia (MM)')" class="text-brand-ink/70 hover:text-brand-darkred font-bold text-[11px] underline underline-offset-2 cursor-pointer">
+                                <span class="font-semibold text-brand-darkred text-[11px]">★ Lab Multimedia & Studio Podcast Modern</span>
+                                <button type="button" @click="handleOpenKonsultasi('Desain Komunikasi Visual (DKV)')" class="text-brand-ink/70 hover:text-brand-darkred font-bold text-[11px] underline underline-offset-2 cursor-pointer">
                                     Pilih Jurusan
                                 </button>
                             </div>
                         </div>
 
+                        <!-- 4. LPB -->
                         <div class="bg-white rounded-card p-5 sm:p-6 shadow-softpill border border-brand-ink/10 flex flex-col justify-between hover:shadow-softpill hover:-translate-y-1 transition-all duration-300 group">
                             <div class="space-y-2.5">
                                 <div class="flex items-center justify-between">
-                                    <span class="bg-brand-darkred text-white font-bold text-xs px-3 py-1 rounded-full shadow-xs">PKM</span>
-                                    <span class="text-[11px] font-bold text-brand-darkred font-mono">AKL / PKM</span>
+                                    <span class="bg-brand-darkred text-white font-bold text-xs px-3 py-1 rounded-full shadow-xs">LPB</span>
+                                    <span class="text-[11px] font-bold text-brand-darkred font-mono">LPB / Bank</span>
                                 </div>
                                 <h3 class="font-display font-bold uppercase tracking-wide text-base sm:text-lg text-brand-ink group-hover:text-brand-darkred transition-colors">
-                                    Perbankan dan Keuangan Mikro
+                                    Layanan Perbankan
                                 </h3>
                                 <p class="text-xs text-brand-ink/75 leading-relaxed">
-                                    Pendidikan akuntansi perbankan syariah/konvensional, pengelolaan kas teller, administrasi pembukuan software Zahir, dan perbankan digital.
+                                    Pendidikan akuntansi perbankan syariah & konvensional, simulasi operasional teller, manajemen kas, dan layanan perbankan digital.
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-brand-ink/10 flex items-center justify-between text-xs">
-                                <span class="font-semibold text-brand-darkred text-[11px]">★ Bank Mini Sekolah & Kerjasama Bank Mandiri</span>
-                                <button type="button" @click="handleOpenKonsultasi('Perbankan dan Keuangan Mikro (PKM)')" class="text-brand-ink/70 hover:text-brand-darkred font-bold text-[11px] underline underline-offset-2 cursor-pointer">
+                                <span class="font-semibold text-brand-darkred text-[11px]">★ Bank Mini Sekolah & Kemitraan Bank Mandiri</span>
+                                <button type="button" @click="handleOpenKonsultasi('Layanan Perbankan (LPB)')" class="text-brand-ink/70 hover:text-brand-darkred font-bold text-[11px] underline underline-offset-2 cursor-pointer">
+                                    Pilih Jurusan
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 5. TOI -->
+                        <div class="bg-white rounded-card p-5 sm:p-6 shadow-softpill border border-brand-ink/10 flex flex-col justify-between hover:shadow-softpill hover:-translate-y-1 transition-all duration-300 group sm:col-span-2 lg:col-span-1">
+                            <div class="space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-brand-darkred text-white font-bold text-xs px-3 py-1 rounded-full shadow-xs">TOI</span>
+                                    <span class="text-[11px] font-bold text-brand-darkred font-mono">TOI / Otomasi</span>
+                                </div>
+                                <h3 class="font-display font-bold uppercase tracking-wide text-base sm:text-lg text-brand-ink group-hover:text-brand-darkred transition-colors">
+                                    Teknik Otomasi Industri
+                                </h3>
+                                <p class="text-xs text-brand-ink/75 leading-relaxed">
+                                    Penguasaan sistem otomasi industri, PLC programming, robotika manufaktur, mekatronika, pneumatik, dan sistem kontrol cerdas 4.0.
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-brand-ink/10 flex items-center justify-between text-xs">
+                                <span class="font-semibold text-brand-darkred text-[11px]">★ Lab Robotik & Otomasi Pabrik Berstandar Industri</span>
+                                <button type="button" @click="handleOpenKonsultasi('Teknik Otomasi Industri (TOI)')" class="text-brand-ink/70 hover:text-brand-darkred font-bold text-[11px] underline underline-offset-2 cursor-pointer">
                                     Pilih Jurusan
                                 </button>
                             </div>
@@ -954,7 +1059,7 @@
                             [
                                 'id' => 1,
                                 'tanya' => 'Berapa total biaya pendaftaran awal masuk SMK Plus Pelita Nusantara?',
-                                'jawab' => 'Total biaya masuk cash adalah Rp 5.850.000,- yang sudah mencakup Rincian Biaya PPDB (Rp 3.875.000,- termasuk SPP bulan Juli, dana pembangunan, pelatihan karakter, foto & simpanan koperasi) serta Rincian Seragam & 13 Item Atribut Resmi Lengkap (Rp 1.975.000,-).'
+                                'jawab' => 'Total biaya masuk cash adalah Rp '.number_format($calcDspCash, 0, ',', '.').',- yang sudah mencakup Rincian Biaya PPDB (Rp '.number_format($calcBiayaPendidikan, 0, ',', '.').',- termasuk SPP bulan pertama, dana pembangunan, pelatihan karakter, foto & simpanan koperasi) serta Rincian Seragam & 13 Item Atribut Resmi Lengkap (Rp '.number_format($calcBiayaSeragam, 0, ',', '.').',-).'
                             ],
                             [
                                 'id' => 2,
@@ -969,12 +1074,12 @@
                             [
                                 'id' => 4,
                                 'tanya' => 'Bagaimana cara melakukan pembayaran biaya PPDB?',
-                                'jawab' => 'Pembayaran dapat dilakukan langsung secara tunai (cash) di loket panitia PPDB kampus SMK Plus Pelita Nusantara Cibinong, atau transfer melalui rekening resmi yayasan (Bank Mandiri / sistem aplikasi Pintro) dengan verifikasi bukti transfer ke bagian administrasi.'
+                                'jawab' => 'Pembayaran dapat dilakukan langsung secara tunai (cash) di loket panitia PPDB kampus SMK Plus Pelita Nusantara Cibinong, atau transfer ke rekening resmi yayasan: '.(!empty($rekeningList) ? collect($rekeningList)->map(fn($r) => ($r['bank'] ?? 'Bank').': '.($r['nomor'] ?? '').' a.n. '.($r['atas_nama'] ?? ''))->implode(', ') : 'Bank Syariah Indonesia (BSI), Bank Mandiri & Bank BRI').' dengan verifikasi bukti transfer ke bagian administrasi.'
                             ],
                             [
                                 'id' => 5,
                                 'tanya' => 'Apa saja kompetensi keahlian (jurusan) yang tersedia?',
-                                'jawab' => "Terdapat 4 kompetensi keahlian unggulan berakreditasi 'A' Unggul: Rekayasa Perangkat Lunak (RPL), Teknik Komputer dan Jaringan (TKJ), Multimedia (MM), serta Perbankan dan Keuangan Mikro (PKM)."
+                                'jawab' => "Terdapat 5 kompetensi keahlian unggulan berakreditasi 'A' Unggul: Rekayasa Perangkat Lunak (RPL), Teknik Komputer dan Jaringan (TKJ), Desain Komunikasi Visual (DKV), Layanan Perbankan (LPB), serta Teknik Otomasi Industri (TOI)."
                             ],
                             [
                                 'id' => 6,
@@ -1075,7 +1180,7 @@
             <form x-show="!konsultasiSuccess" @submit.prevent="handleKonsultasiSubmit()" class="space-y-4">
                 <div class="pb-3 border-b border-brand-ink/10">
                     <span class="font-editorial-eyebrow text-brand-darkred tracking-eyebrow text-xs uppercase block font-bold">
-                        KONSULTASI PPDB 2024/2025
+                        KONSULTASI PPDB {{ $activeWave?->tahun_ajaran ?? '2027/2028' }}
                     </span>
                     <h3 class="font-editorial-h3 text-brand-ink font-bold text-xl sm:text-2xl mt-0.5">
                         Konsultasi Pembiayaan & Jurusan
@@ -1141,8 +1246,9 @@
                     >
                         <option value="Rekayasa Perangkat Lunak (RPL)">Rekayasa Perangkat Lunak (RPL)</option>
                         <option value="Teknik Komputer dan Jaringan (TKJ)">Teknik Komputer dan Jaringan (TKJ)</option>
-                        <option value="Multimedia (MM)">Multimedia (MM)</option>
-                        <option value="Perbankan dan Keuangan Mikro (PKM)">Perbankan dan Keuangan Mikro (PKM)</option>
+                        <option value="Desain Komunikasi Visual (DKV)">Desain Komunikasi Visual (DKV)</option>
+                        <option value="Layanan Perbankan (LPB)">Layanan Perbankan (LPB)</option>
+                        <option value="Teknik Otomasi Industri (TOI)">Teknik Otomasi Industri (TOI)</option>
                     </select>
                 </div>
 
@@ -1155,7 +1261,7 @@
                         x-model="konsultasiForm.rencanaPembayaran"
                         class="w-full rounded-full border border-brand-ink/20 px-4 py-2.5 text-xs sm:text-sm text-brand-ink bg-[#F9F8F6] focus:bg-white focus:outline-none focus:border-brand-darkred transition-all"
                     >
-                        <option value="Cash Lunas (Rp 5.850.000)">Pembayaran Tunai Lunas (Rp 5.850.000,-)</option>
+                        <option value="Cash Lunas (Rp {{ number_format($calcDspCash, 0, ',', '.') }})">Pembayaran Tunai Lunas (Rp {{ number_format($calcDspCash, 0, ',', '.') }},-)</option>
                         <option value="Bertahap / Cicilan 2-3 Tahap">Skema Angsuran Bertahap (2 - 3 Tahap)</option>
                         <option value="Konsultasi Jalur Beasiswa Prestasi">Konsultasi Jalur Beasiswa Prestasi</option>
                     </select>
