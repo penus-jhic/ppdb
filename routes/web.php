@@ -26,11 +26,18 @@ Route::get('/', function () {
 Route::prefix('ppdb')->group(function () {
     // 1. Public Routes
     Route::get('/', [PpdbController::class, 'index'])->name('ppdb.index');
-    Route::post('/daftar', [PpdbController::class, 'store'])->name('ppdb.store');
+    Route::post('/daftar', [PpdbController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('ppdb.store');
     Route::get('/akomodasi', [PpdbController::class, 'akomodasi'])->name('ppdb.akomodasi');
     Route::get('/pengumuman', [PpdbController::class, 'pengumuman'])->name('ppdb.pengumuman');
-    Route::match(['GET', 'POST'], '/cek-status', [PpdbController::class, 'cekStatus'])->name('ppdb.cek-status');
-    Route::get('/cetak-kartu/{id}', [PpdbController::class, 'cetakKartu'])->name('ppdb.cetak-kartu');
+    Route::match(['GET', 'POST'], '/cek-status', [PpdbController::class, 'cekStatus'])
+        ->middleware('throttle:20,1')
+        ->name('ppdb.cek-status');
+    Route::get('/cetak-kartu/{uuid}', [PpdbController::class, 'cetakKartu'])
+        ->where('uuid', '[0-9a-fA-F-]{36}')
+        ->middleware('throttle:60,1')
+        ->name('ppdb.cetak-kartu');
     Route::match(['GET', 'POST'], '/logout', function () {
         return redirect('/ppdb')->withoutCookie('access_token');
     })->name('ppdb.logout');
@@ -78,4 +85,4 @@ Route::get('/cek-status', fn () => redirect('/ppdb/cek-status'));
 Route::get('/dashboard', fn () => redirect('/ppdb/dashboard'));
 Route::get('/dashboard/pendaftar', fn () => redirect('/ppdb/dashboard/pendaftar'));
 Route::get('/dashboard/pendaftar/{id}', fn ($id) => redirect('/ppdb/dashboard/pendaftar/'.$id));
-Route::post('/daftar', [PpdbController::class, 'store']);
+Route::post('/daftar', [PpdbController::class, 'store'])->middleware('throttle:6,1');

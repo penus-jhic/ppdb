@@ -292,7 +292,7 @@
                             <td class="py-3.5 px-4 whitespace-nowrap text-center">
                                 <div class="flex items-center justify-center gap-1.5">
                                     <!-- Cetak Kartu Button -->
-                                    <a href="{{ route('ppdb.cetak-kartu', $pendaftar->id) }}" target="_blank"
+                                    <a href="{{ route('ppdb.cetak-kartu', $pendaftar->uuid ?? $pendaftar->id) }}" target="_blank"
                                        class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors inline-flex items-center justify-center"
                                        title="Cetak Kartu Peserta Resmi">
                                         <svg class="w-3.5 h-3.5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">

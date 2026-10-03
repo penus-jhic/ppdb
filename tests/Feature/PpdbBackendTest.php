@@ -7,6 +7,7 @@ use App\Models\PpdbRegistration;
 use App\Models\PpdbWave;
 use Database\Seeders\PpdbSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -76,19 +77,34 @@ class PpdbBackendTest extends TestCase
     }
 
     /**
-     * Test printable card loads successfully for a student
+     * SEC-01: Test printable card loads successfully via UUID
      */
-    public function test_cetak_kartu_is_accessible(): void
+    public function test_cetak_kartu_is_accessible_via_uuid(): void
     {
         $student = PpdbRegistration::first();
-        if ($student) {
-            $response = $this->get("/ppdb/cetak-kartu/{$student->id}");
-            $response->assertStatus(200);
-            $response->assertSee($student->nama_lengkap);
-            $response->assertSee($student->nomor_registrasi);
-        } else {
-            $this->assertTrue(true);
-        }
+        $this->assertNotNull($student);
+        $this->assertNotEmpty($student->uuid);
+
+        $response = $this->get("/ppdb/cetak-kartu/{$student->uuid}");
+        $response->assertStatus(200);
+        $response->assertSee($student->nama_lengkap);
+        $response->assertSee($student->nomor_registrasi);
+    }
+
+    /**
+     * SEC-01: Test sequential numeric IDs return 404 to prevent IDOR enumeration
+     */
+    public function test_cetak_kartu_blocks_sequential_integer_idor(): void
+    {
+        $student = PpdbRegistration::first();
+        $this->assertNotNull($student);
+
+        // Access via sequential integer ID must be rejected with 404
+        $response = $this->get("/ppdb/cetak-kartu/{$student->id}");
+        $response->assertStatus(404);
+
+        $response1 = $this->get('/ppdb/cetak-kartu/1');
+        $response1->assertStatus(404);
     }
 
     /**
@@ -463,5 +479,87 @@ class PpdbBackendTest extends TestCase
         $response->assertJson([
             'success' => false,
         ]);
+    }
+
+    /**
+     * SEC-02: Test checking status with wildcard substring does NOT leak records
+     */
+    public function test_cek_status_wildcard_substring_does_not_leak_records(): void
+    {
+        // Wildcard search like "2027" or "PPDB" or partial year must not return arbitrary records
+        $response = $this->get('/ppdb/cek-status?keyword=2027');
+        $response->assertStatus(200);
+        $response->assertSee('Data Tidak Ditemukan');
+        $response->assertDontSee('PPDB-2027-');
+
+        $responsePpdb = $this->get('/ppdb/cek-status?keyword=PPDB');
+        $responsePpdb->assertStatus(200);
+        $responsePpdb->assertSee('Data Tidak Ditemukan');
+        $responsePpdb->assertDontSee('PPDB-2027-');
+    }
+
+    /**
+     * SEC-03: Test CSV export stream sanitizes formula injection prefixes
+     */
+    public function test_export_pendaftar_csv_sanitizes_formula_injection(): void
+    {
+        $this->fakeAuthAdmin();
+
+        // Create student with malicious formula prefixes
+        PpdbRegistration::create([
+            'nomor_registrasi' => 'PPDB-2027-99991',
+            'nama_lengkap' => '=cmd|\' /C calc\'!A0',
+            'nama_panggilan' => '+62812000000',
+            'nisn' => '0091112223',
+            'tempat_lahir' => '-FormulaMinus',
+            'tanggal_lahir_hari' => '01',
+            'tanggal_lahir_bulan' => '01',
+            'tanggal_lahir_tahun' => '2010',
+            'jenis_kelamin' => 'L',
+            'alamat_lengkap' => '@SUM(1+1)',
+            'tipe_pendaftar' => 'Pendaftar Baru',
+            'kelas_pilihan' => 'Reguler',
+            'jurusan' => 'RPL',
+            'jalur_seleksi' => 'Reguler',
+            'asal_sekolah' => "\tTabIndentSchool",
+            'nomor_kontak_pendaftar' => '+6281234567890',
+            'nomor_kontak_ortu' => '081234567891',
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer valid_admin_token')
+            ->get('/ppdb/dashboard/pendaftar/export');
+
+        $response->assertStatus(200);
+        $content = $response->streamedContent();
+
+        // Assert formula characters are prepended with single quote
+        $this->assertStringContainsString("'=cmd|", $content);
+        $this->assertStringContainsString("'+62812000000", $content);
+        $this->assertStringContainsString("'-FormulaMinus", $content);
+        $this->assertStringContainsString("'@SUM(1+1)", $content);
+        $this->assertStringContainsString("'\tTabIndentSchool", $content);
+        $this->assertStringContainsString("'+6281234567890", $content);
+    }
+
+    /**
+     * SEC-04: Test rate limiting on public registration and status lookups
+     */
+    public function test_rate_limiting_on_registration_and_status(): void
+    {
+        // 1. Test POST /ppdb/daftar throttled after 6 requests
+        for ($i = 0; $i < 6; $i++) {
+            $this->postJson('/ppdb/daftar', []);
+        }
+        $responseThrottleDaftar = $this->postJson('/ppdb/daftar', []);
+        $responseThrottleDaftar->assertStatus(429);
+
+        // 2. Test GET /ppdb/cek-status throttled after 20 requests
+        for ($i = 0; $i < 20; $i++) {
+            $this->getJson('/ppdb/cek-status?nisn=0000000000');
+        }
+        $responseThrottleStatus = $this->getJson('/ppdb/cek-status?nisn=0000000000');
+        $responseThrottleStatus->assertStatus(429);
+
+        Cache::flush();
     }
 }

@@ -8,6 +8,7 @@ use App\Models\PpdbRegistration;
 use App\Models\PpdbWave;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class PpdbSeeder extends Seeder
 {
@@ -435,6 +436,11 @@ class PpdbSeeder extends Seeder
                 ['nomor_registrasi' => $p['nomor_registrasi']],
                 $p
             );
+        }
+
+        foreach (PpdbRegistration::whereNull('uuid')->get() as $reg) {
+            $reg->uuid = (string) Str::uuid();
+            $reg->save();
         }
     }
 }

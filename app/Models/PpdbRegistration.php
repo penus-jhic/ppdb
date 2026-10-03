@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class PpdbRegistration extends Model
 {
@@ -18,6 +19,18 @@ class PpdbRegistration extends Model
         'jenis_layanan' => 'array',
         'sumber_info' => 'array',
     ];
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (self $registration) {
+            if (empty($registration->uuid)) {
+                $registration->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     /**
      * Relasi ke gelombang pendaftaran

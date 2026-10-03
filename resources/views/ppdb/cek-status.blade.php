@@ -308,9 +308,9 @@
                             </div>
 
                             <div class="shrink-0 flex items-center flex-wrap gap-2 no-print">
-                                <template x-if="searchResult?.id">
+                                <template x-if="searchResult?.uuid || searchResult?.id">
                                     <a
-                                        :href="'/ppdb/cetak-kartu/' + searchResult.id"
+                                        :href="'/ppdb/cetak-kartu/' + (searchResult.uuid || searchResult.id)"
                                         target="_blank"
                                         class="py-2 px-4 rounded-full bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                                     >
@@ -437,9 +437,9 @@
                             <span>Cetak Bukti</span>
                         </button>
 
-                        <template x-if="searchResult?.id">
+                        <template x-if="searchResult?.uuid || searchResult?.id">
                             <a
-                                :href="'/ppdb/cetak-kartu/' + searchResult.id"
+                                :href="'/ppdb/cetak-kartu/' + (searchResult.uuid || searchResult.id)"
                                 target="_blank"
                                 class="w-full sm:w-auto py-2.5 px-6 rounded-full bg-[#B72A32] hover:bg-[#7A1018] text-white text-xs font-bold shadow-softpill inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                             >

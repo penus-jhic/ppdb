@@ -9,6 +9,7 @@ use App\Models\PpdbWave;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PpdbController extends Controller
@@ -128,6 +129,7 @@ class PpdbController extends Controller
                 'tanggalDaftar' => $tanggalDaftar,
                 'data' => [
                     'id' => $registration->id,
+                    'uuid' => $registration->uuid,
                     'namaLengkap' => $registration->nama_lengkap,
                     'nisn' => $registration->nisn,
                     'jurusan' => $registration->jurusan,
@@ -139,6 +141,7 @@ class PpdbController extends Controller
 
         return redirect()->route('ppdb.index')->with('sukses_daftar', [
             'id' => $registration->id,
+            'uuid' => $registration->uuid,
             'noPendaftaran' => $nomorRegistrasi,
             'namaLengkap' => $registration->nama_lengkap,
         ]);
@@ -271,9 +274,10 @@ class PpdbController extends Controller
         if (! empty($cleanNisn)) {
             $searched = true;
             $pendaftar = PpdbRegistration::with('gelombang')
-                ->where('nisn', $cleanNisn)
-                ->orWhere('nomor_registrasi', $cleanNisn)
-                ->orWhere('nomor_registrasi', 'LIKE', "%{$cleanNisn}%")
+                ->where(function ($query) use ($cleanNisn) {
+                    $query->where('nisn', $cleanNisn)
+                        ->orWhere('nomor_registrasi', $cleanNisn);
+                })
                 ->first();
         }
 
@@ -307,6 +311,7 @@ class PpdbController extends Controller
 
         return [
             'id' => $pendaftar->id,
+            'uuid' => $pendaftar->uuid,
             'nomor_registrasi' => $pendaftar->nomor_registrasi,
             'noPendaftaran' => $pendaftar->nomor_registrasi,
             'nisn' => $pendaftar->nisn,
@@ -355,11 +360,17 @@ class PpdbController extends Controller
 
     /**
      * Cetak Kartu Tanda Peserta / Bukti Pendaftaran Resmi (Print-Ready)
-     * GET /ppdb/cetak-kartu/{id}
+     * GET /ppdb/cetak-kartu/{uuid}
      */
-    public function cetakKartu($id)
+    public function cetakKartu(string $uuid)
     {
-        $pendaftar = PpdbRegistration::with('gelombang')->findOrFail($id);
+        if (! Str::isUuid($uuid)) {
+            abort(404, 'Kartu tanda peserta tidak ditemukan.');
+        }
+
+        $pendaftar = PpdbRegistration::with('gelombang')
+            ->where('uuid', $uuid)
+            ->firstOrFail();
 
         return view('ppdb.cetak-kartu', compact('pendaftar'));
     }
@@ -425,7 +436,7 @@ class PpdbController extends Controller
             ]);
 
             foreach ($pendaftarData as $row) {
-                fputcsv($handle, [
+                $csvRow = [
                     $row->nomor_registrasi,
                     $row->gelombang?->nama ?? 'Gelombang 1',
                     strtoupper(str_replace('_', ' ', $row->status)),
@@ -446,7 +457,9 @@ class PpdbController extends Controller
                     $row->alamat_lengkap ?? '-',
                     $row->created_at ? $row->created_at->format('Y-m-d H:i') : '-',
                     $row->catatan ?? '-',
-                ]);
+                ];
+
+                fputcsv($handle, array_map([$this, 'sanitizeCsvField'], $csvRow));
             }
 
             fclose($handle);
@@ -454,6 +467,24 @@ class PpdbController extends Controller
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ]);
+    }
+
+    /**
+     * Sanitasi nilai kolom CSV untuk mencegah Formula / CSV Injection (CWE-1236).
+     * Jika diawali formula operator (=, +, -, @, \t, \r), tambahkan prefix petik tunggal (').
+     */
+    protected function sanitizeCsvField(mixed $value): mixed
+    {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        $dangerousChars = ['=', '+', '-', '@', "\t", "\r"];
+        if ($value !== '' && in_array($value[0], $dangerousChars, true)) {
+            return "'".$value;
+        }
+
+        return $value;
     }
 
     /**
