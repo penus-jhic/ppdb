@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PpdbController;
+use App\Http\Controllers\StaticAssetController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +25,13 @@ Route::get('/', function () {
 
 // Primary PPDB Routes
 Route::prefix('ppdb')->group(function () {
+    // 0. Static Asset Handlers (Kompatibilitas Reverse Proxy Path-Based)
+    Route::get('/assets/{path}', [StaticAssetController::class, 'serveAssets'])->where('path', '.*')->name('ppdb.static.assets');
+    Route::get('/build/{path}', [StaticAssetController::class, 'serveBuild'])->where('path', '.*')->name('ppdb.static.build');
+    Route::get('/storage/{path}', [StaticAssetController::class, 'serveStorage'])->where('path', '.*')->name('ppdb.static.storage');
+    Route::get('/images/{path}', [StaticAssetController::class, 'serveImages'])->where('path', '.*')->name('ppdb.static.images');
+    Route::get('/uploads/{path}', [StaticAssetController::class, 'serveUploads'])->where('path', '.*')->name('ppdb.static.uploads');
+
     // 1. Public Routes
     Route::get('/', [PpdbController::class, 'index'])->name('ppdb.index');
     Route::post('/daftar', [PpdbController::class, 'store'])

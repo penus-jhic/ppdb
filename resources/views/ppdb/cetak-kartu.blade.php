@@ -69,7 +69,7 @@
         <!-- Official Kop Surat / Header Sekolah -->
         <div class="flex items-center justify-between pb-6 border-b-2 border-slate-900 gap-4">
             <div class="w-20 h-20 shrink-0 flex items-center justify-center">
-                <img src="{{ asset('assets/images/logo-penus.png') }}" alt="Logo SMK Plus Pelita Nusantara" class="max-w-full max-h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/100x100/1e3a8a/white?text=PENUS';">
+                <img src="{{ asset('assets/logo-penus.png') }}" alt="Logo SMK Plus Pelita Nusantara" class="max-w-full max-h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/100x100/1e3a8a/white?text=PENUS';">
             </div>
             <div class="text-center flex-1 px-2">
                 <p class="text-xs uppercase font-bold tracking-widest text-slate-600">YAYASAN PELITA NUSANTARA</p>
