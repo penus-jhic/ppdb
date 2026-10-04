@@ -163,37 +163,10 @@
                             <li><a href="https://smkpluspnb.sch.id" target="_blank" rel="noreferrer" class="hover:text-brand-darkred transition-colors">Profil Sekolah Resmi</a></li>
                         </ul>
                     </div>
-
-                    <div>
-                        <h4 class="font-display font-bold text-sm sm:text-base uppercase tracking-wide text-brand-ink mb-3.5">
-                            Aplikasi Siswa
-                        </h4>
-                        <ul class="space-y-2 text-xs sm:text-[13px] text-brand-ink/75 font-medium">
-                            <li><a href="#app" class="hover:text-brand-darkred transition-colors">DigiYouth</a></li>
-                            <li><a href="#app" class="hover:text-brand-darkred transition-colors">MyLms</a></li>
-                            <li><a href="#app" class="hover:text-brand-darkred transition-colors">SiAkad</a></li>
-                            <li><a href="#app" class="hover:text-brand-darkred transition-colors">Invert</a></li>
-                        </ul>
-                    </div>
                 </div>
 
                 <!-- KOLOM 3: Berita Sekolah & Status PPDB -->
                 <div class="lg:col-span-3 space-y-6">
-                    <div>
-                        <h4 class="font-display font-bold text-sm sm:text-base uppercase tracking-wide text-brand-ink mb-3.5">
-                            Berita Sekolah
-                        </h4>
-                        <ul class="space-y-2 text-xs sm:text-[13px] text-brand-ink/75 font-medium">
-                            <li><a href="{{ url('/ppdb/pengumuman') }}" class="hover:text-brand-darkred transition-colors">Kegiatan Sekolah</a></li>
-                            <li><a href="{{ url('/ppdb/pengumuman') }}" class="hover:text-brand-darkred transition-colors">Prestasi</a></li>
-                            <li><a href="{{ url('/ppdb/pengumuman') }}" class="hover:text-brand-darkred transition-colors">Pengumuman</a></li>
-                            <li><a href="{{ url('/ppdb/pengumuman') }}" class="hover:text-brand-darkred transition-colors">Kemitraan & Kerja Sama</a></li>
-                            <li><a href="{{ url('/ppdb/pengumuman') }}" class="hover:text-brand-darkred transition-colors">Karya & Inovasi Siswa</a></li>
-                            <li><a href="{{ url('/ppdb/pengumuman') }}" class="hover:text-brand-darkred transition-colors">Artikel & Edukasi</a></li>
-                            <li><a href="{{ url('/ppdb/pengumuman') }}" class="hover:text-brand-darkred transition-colors">Alumni</a></li>
-                        </ul>
-                    </div>
-
                     <div>
                         <h4 class="font-display font-bold text-sm sm:text-base uppercase tracking-wide text-brand-ink mb-3.5">
                             Informasi PPDB Terkini

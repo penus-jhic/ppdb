@@ -854,79 +854,26 @@
                                     </div>
                                 </div>
 
-                                <!-- 12. Asal Sekolah (Searchable Combobox) -->
-                                <div class="w-full relative" x-data="{ open: false, query: '' }"
-                                    @click.away="open = false">
+                                <!-- 12. Asal Sekolah (Input Text) -->
+                                <div class="w-full">
                                     <label
                                         class="block text-xs font-bold uppercase tracking-wider text-brand-ink/70 mb-2 select-none">
                                         Asal Sekolah (SMP / MTs) <span class="text-brand-signal font-bold ml-1">*</span>
                                     </label>
-
-                                    <div class="relative">
-                                        <div @click="open = !open"
-                                            class="w-full flex items-center justify-between rounded-full border text-sm bg-[#F9F8F6] py-3 px-5 transition-all duration-200 cursor-pointer border-brand-ink/15 hover:border-brand-ink/35"
-                                            :class="open ? 'border-brand-darkred ring-2 ring-brand-darkred/20 bg-white' : ''">
-                                            <span class="truncate"
-                                                :class="formData.asalSekolah ? 'text-brand-ink font-medium' : 'text-brand-ink/40'"
-                                                x-text="formData.asalSekolah || 'Cari atau pilih nama sekolah asal'"></span>
-                                            <div class="flex items-center gap-1.5 ml-2 text-brand-ink/50">
-                                                <template x-if="formData.asalSekolah">
-                                                    <button type="button" @click.stop="formData.asalSekolah = ''"
-                                                        class="hover:text-brand-ink p-0.5 rounded-full">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                        </svg>
-                                                    </button>
-                                                </template>
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </div>
-                                        </div>
-
-                                        <!-- Dropdown List -->
-                                        <div x-show="open" x-transition.opacity
-                                            class="absolute top-full left-0 right-0 mt-2 z-40 bg-white rounded-card border border-brand-ink/15 shadow-softpill overflow-hidden animate-fade-in">
-                                            <div class="p-3 border-b border-brand-ink/10 bg-brand-softmist/40">
-                                                <div class="relative flex items-center">
-                                                    <svg class="w-4 h-4 absolute left-3.5 text-brand-ink/40" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                                    </svg>
-                                                    <input type="text" x-model="query"
-                                                        placeholder="Ketik nama sekolah..."
-                                                        class="w-full bg-white border border-brand-ink/20 rounded-full pl-9 pr-4 py-2 text-xs text-brand-ink placeholder:text-brand-ink/40 focus:outline-none focus:ring-1 focus:ring-brand-darkred focus:border-brand-darkred" />
-                                                </div>
-                                            </div>
-
-                                            <div class="max-h-56 overflow-y-auto divide-y divide-brand-ink/10">
-                                                <template
-                                                    x-for="sch in sekolahList.filter(s => s.toLowerCase().includes(query.toLowerCase()))"
-                                                    :key="sch">
-                                                    <div @click="formData.asalSekolah = sch; open = false; query = '';"
-                                                        class="px-4 py-2.5 text-xs sm:text-sm cursor-pointer flex items-center justify-between transition-colors hover:bg-brand-softmist/50"
-                                                        :class="formData.asalSekolah === sch ? 'bg-brand-softmist font-semibold text-brand-darkred' : 'text-brand-ink'">
-                                                        <span x-text="sch"></span>
-                                                        <template x-if="formData.asalSekolah === sch">
-                                                            <svg class="w-4 h-4 text-brand-darkred" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2" d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        </template>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="text-[12px] text-brand-ink/60 mt-1.5 leading-normal">Pilih dari daftar
-                                        sekolah atau ketik nama sekolah Anda</p>
+                                    <input type="text" id="asalSekolah" x-model="formData.asalSekolah"
+                                        @blur="handleBlur('asalSekolah')"
+                                        placeholder="Contoh: SMP Negeri 1 Cibinong"
+                                        class="w-full rounded-full border text-sm text-brand-ink placeholder:text-brand-ink/40 bg-[#F9F8F6] focus:bg-white px-5 py-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-darkred/20 focus:border-brand-darkred"
+                                        :class="touched.asalSekolah && errors.asalSekolah ? 'border-brand-signal ring-1 ring-brand-signal/30' : 'border-brand-ink/15 hover:border-brand-ink/35'" />
+                                    <template x-if="touched.asalSekolah && errors.asalSekolah">
+                                        <p class="text-[12px] text-brand-signal font-semibold mt-1.5"
+                                            x-text="errors.asalSekolah"></p>
+                                    </template>
+                                    <template x-if="!(touched.asalSekolah && errors.asalSekolah)">
+                                        <p class="text-[12px] text-brand-ink/60 mt-1.5 leading-normal">
+                                            Tuliskan nama lengkap sekolah asal (SMP / MTs / Sederajat)
+                                        </p>
+                                    </template>
                                 </div>
 
                                 <!-- 13. Kontak Handphone -->
@@ -1007,53 +954,6 @@
                                     </div>
                                 </div>
 
-                                <!-- 15. Jenis Layanan (Multi-Select Dropdown) -->
-                                <div class="w-full relative" x-data="{ open: false }" @click.away="open = false">
-                                    <label
-                                        class="block text-xs font-bold uppercase tracking-wider text-brand-ink/70 mb-2 select-none">
-                                        Peminatan Fasilitas Layanan Tambahan
-                                    </label>
-                                    <div class="relative">
-                                        <div @click="open = !open"
-                                            class="w-full flex items-center justify-between rounded-full border text-sm bg-[#F9F8F6] py-3 px-5 transition-all duration-200 cursor-pointer border-brand-ink/15 hover:border-brand-ink/35"
-                                            :class="open ? 'border-brand-darkred ring-2 ring-brand-darkred/20 bg-white' : ''">
-                                            <span class="truncate"
-                                                :class="formData.jenisLayanan.length > 0 ? 'text-brand-ink font-medium' : 'text-brand-ink/40'"
-                                                x-text="formData.jenisLayanan.length === 0 ? 'Pilih layanan jika berminat' : (formData.jenisLayanan.length <= 2 ? formData.jenisLayanan.join(', ') : formData.jenisLayanan.length + ' item dipilih')"></span>
-                                            <svg class="w-4 h-4 text-brand-ink/50 ml-2 shrink-0" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
-
-                                        <div x-show="open" x-transition.opacity
-                                            class="absolute top-full left-0 right-0 mt-2 z-40 bg-white rounded-card border border-brand-ink/15 shadow-softpill max-h-60 overflow-y-auto divide-y divide-brand-ink/10 py-1 animate-fade-in">
-                                            <template
-                                                x-for="lay in ['Catering', 'Antar Jemput', 'AHA Music Course', 'Laundry']"
-                                                :key="lay">
-                                                <div @click="toggleArray(formData.jenisLayanan, lay)"
-                                                    class="px-4 py-2.5 text-xs sm:text-sm cursor-pointer flex items-center gap-3 transition-colors hover:bg-brand-softmist/50"
-                                                    :class="formData.jenisLayanan.includes(lay) ? 'bg-brand-softmist font-semibold text-brand-darkred' : 'text-brand-ink'">
-                                                    <input type="checkbox"
-                                                        :checked="formData.jenisLayanan.includes(lay)"
-                                                        class="w-4 h-4 rounded text-brand-darkred border-brand-ink/30 accent-[#7A1018] pointer-events-none" />
-                                                    <span class="flex-1 select-none" x-text="lay"></span>
-                                                    <template x-if="formData.jenisLayanan.includes(lay)">
-                                                        <svg class="w-4 h-4 text-brand-darkred" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                    </template>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <p class="text-[12px] text-brand-ink/60 mt-1.5 leading-normal">
-                                        Dapat memilih lebih dari 1 opsi (Catering, Antar Jemput, Music Course, dll)
-                                    </p>
-                                </div>
 
                                 <!-- 16. Sumber Informasi -->
                                 <div class="w-full relative" x-data="{ open: false }" @click.away="open = false">
@@ -1465,22 +1365,7 @@
                                     </button>
                                 </div>
                                 <div class="divide-y divide-brand-ink/10 mt-1 text-sm">
-                                    <div
-                                        class="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                                        <span
-                                            class="text-xs font-bold uppercase tracking-wider text-brand-ink/60">Peminatan
-                                            Fasilitas Layanan</span>
-                                        <div class="flex flex-wrap gap-1.5 justify-start sm:justify-end">
-                                            <template x-if="formData.jenisLayanan.length === 0">
-                                                <span class="text-brand-ink/40 italic text-sm">-</span>
-                                            </template>
-                                            <template x-for="lay in formData.jenisLayanan" :key="lay">
-                                                <span
-                                                    class="inline-block bg-brand-softmist text-brand-darkred text-xs font-semibold px-3 py-1 rounded-full border border-brand-ink/10"
-                                                    x-text="lay"></span>
-                                            </template>
-                                        </div>
-                                    </div>
+
                                     <div
                                         class="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span
@@ -1689,24 +1574,6 @@
             noPendaftaran: '',
             tanggalDaftar: '',
         },
-        sekolahList: [
-            "SMP Negeri 1 Cibinong",
-            "SMP Negeri 2 Cibinong",
-            "SMP Negeri 3 Cibinong",
-            "SMP Negeri 4 Cibinong",
-            "SMP Negeri 1 Bogor",
-            "SMP Negeri 2 Bogor",
-            "SMP Negeri 3 Bogor",
-            "MTs Negeri 1 Bogor",
-            "MTs Negeri 2 Cibinong",
-            "SMP Plus PGRI Cibinong",
-            "SMP IT Al Madinah",
-            "SMP IT Ummul Quro",
-            "SMP Taruna Bangsa",
-            "SMP Regina Pacis Bogor",
-            "SMP Islam Al-Azhar Cibinong",
-            "SMP PGRI 1 Cibinong"
-        ],
         jurusanList: [
             {
                 value: "Rekayasa Perangkat Lunak (RPL)",
@@ -1826,6 +1693,10 @@
                 case 'tanggalLahirTahun':
                     if (!val) this.errors.tanggalLahirTahun = 'Pilih tahun.';
                     else delete this.errors.tanggalLahirTahun;
+                    break;
+                case 'asalSekolah':
+                    if (!val || !val.trim()) this.errors.asalSekolah = 'Asal sekolah wajib diisi.';
+                    else delete this.errors.asalSekolah;
                     break;
                 case 'nomorKontakPendaftar':
                     if (!val || !val.trim()) this.errors.nomorKontakPendaftar = 'Nomor handphone pendaftar wajib diisi.';
