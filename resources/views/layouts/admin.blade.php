@@ -200,6 +200,64 @@
                                 </a>
                             </nav>
                         </div>
+
+                        <!-- SECTION: PINTAS DASHBOARD -->
+                        <div>
+                            <div class="px-3 mb-2">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                    PINTAS DASHBOARD
+                                </span>
+                            </div>
+                            <nav class="space-y-1">
+                                <!-- 1. Admin PPDB (Aktif) -->
+                                <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-[#1E293B] text-white shadow-sm">
+                                    <div class="flex items-center gap-3">
+                                        <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z">
+                                            </path>
+                                        </svg>
+                                        <span>Admin PPDB</span>
+                                    </div>
+                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                                        Aktif
+                                    </span>
+                                </div>
+
+                                <!-- 2. CMS Portal Utama -->
+                                <a href="/admin"
+                                    class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors group">
+                                    <div class="flex items-center gap-3">
+                                        <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                                            <line x1="2" y1="12" x2="22" y2="12" stroke-width="2"></line>
+                                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke-width="2"></path>
+                                        </svg>
+                                        <span>CMS Portal Utama</span>
+                                    </div>
+                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </a>
+
+                                <!-- 3. Admin BKK -->
+                                <a href="/bkk/admin"
+                                    class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors group">
+                                    <div class="flex items-center gap-3">
+                                        <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <rect width="20" height="14" x="2" y="7" rx="2" ry="2" stroke-width="2"></rect>
+                                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke-width="2"></path>
+                                        </svg>
+                                        <span>Admin BKK</span>
+                                    </div>
+                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </a>
+                            </nav>
+                        </div>
                     </div>
                 </div>
 
@@ -321,6 +379,64 @@
                                     </path>
                                 </svg>
                                 <span>Biaya & Akomodasi</span>
+                            </a>
+                        </nav>
+                    </div>
+
+                    <!-- SECTION: PINTAS DASHBOARD -->
+                    <div>
+                        <div class="px-3 mb-2">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                PINTAS DASHBOARD
+                            </span>
+                        </div>
+                        <nav class="space-y-1">
+                            <!-- 1. Admin PPDB (Aktif) -->
+                            <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-[#1E293B] text-white shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z">
+                                        </path>
+                                    </svg>
+                                    <span>Admin PPDB</span>
+                                </div>
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                                    Aktif
+                                </span>
+                            </div>
+
+                            <!-- 2. CMS Portal Utama -->
+                            <a href="/admin"
+                                class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                                        <line x1="2" y1="12" x2="22" y2="12" stroke-width="2"></line>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke-width="2"></path>
+                                    </svg>
+                                    <span>CMS Portal Utama</span>
+                                </div>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>
+
+                            <!-- 3. Admin BKK -->
+                            <a href="/bkk/admin"
+                                class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <rect width="20" height="14" x="2" y="7" rx="2" ry="2" stroke-width="2"></rect>
+                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke-width="2"></path>
+                                    </svg>
+                                    <span>Admin BKK</span>
+                                </div>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
                             </a>
                         </nav>
                     </div>

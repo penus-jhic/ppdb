@@ -1828,7 +1828,7 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             try {
-                const response = await fetch("{{ route('ppdb.store') }}", {
+                const response = await fetch("/ppdb/daftar", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
