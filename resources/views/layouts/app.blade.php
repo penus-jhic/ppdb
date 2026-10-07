@@ -37,6 +37,11 @@
     <!-- Editorial Footer -->
     <x-footer />
 
+    <!-- Navigasi sementara khusus juri (bukan untuk production, lihat PPDB_JURI_NAV) -->
+    @if (config('app.juri_nav'))
+        <x-juri-nav />
+    @endif
+
     @stack('scripts')
 </body>
 </html>

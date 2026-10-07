@@ -30,6 +30,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Navigasi Juri (Sementara)
+    |--------------------------------------------------------------------------
+    |
+    | Tombol melayang "Navigasi Juri" di halaman publik berisi jalan pintas ke
+    | dashboard admin PPDB, khusus untuk memudahkan penjurian lomba.
+    | Set PPDB_JURI_NAV=false untuk menyembunyikannya di production.
+    |
+    */
+
+    'juri_nav' => (bool) env('PPDB_JURI_NAV', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Debug Mode
     |--------------------------------------------------------------------------
     |

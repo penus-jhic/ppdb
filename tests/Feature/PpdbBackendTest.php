@@ -57,6 +57,22 @@ class PpdbBackendTest extends TestCase
     }
 
     /**
+     * Test navigasi sementara khusus juri tampil di halaman publik & bisa dimatikan lewat config
+     */
+    public function test_juri_nav_links_to_dashboard_and_can_be_disabled(): void
+    {
+        $response = $this->get('/ppdb');
+        $response->assertStatus(200);
+        $response->assertSee('Navigasi Juri');
+        $response->assertSee('Bukan untuk production.');
+        $response->assertSee(route('ppdb.dashboard.pendaftar'), false);
+
+        config(['app.juri_nav' => false]);
+
+        $this->get('/ppdb')->assertStatus(200)->assertDontSee('Navigasi Juri');
+    }
+
+    /**
      * Test pengumuman page renders isi_lengkap as markdown HTML
      */
     public function test_pengumuman_page_renders_isi_lengkap_markdown(): void
