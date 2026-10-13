@@ -15,9 +15,36 @@ class PpdbRegistration extends Model
 
     protected $guarded = ['id'];
 
+    /**
+     * Pilihan "Sumber Informasi PPDB" di formulir (boleh pilih lebih dari satu)
+     */
+    public const SUMBER_INFO_OPTIONS = [
+        'Spanduk',
+        'Brosur',
+        'Iklan',
+        'Keluarga / Kerabat / Teman',
+        'Pernah Datang Ke Sekolah',
+        'Youtube',
+        'Lain-lain',
+    ];
+
+    /**
+     * Pilihan "Alasan Utama Minat Mendaftar" di formulir (boleh pilih lebih dari satu)
+     */
+    public const ALASAN_MINAT_OPTIONS = [
+        'Tim Akademik yang berpengalaman',
+        'Lokasi Sekolah dekat Dari Rumah',
+        'Digitalisasi Sekolah',
+        'Gedung dan Sarana Lengkap',
+        'Kualitas Guru yang Baik',
+        'Reputasi Sekolah Baik',
+        'Lainnya',
+    ];
+
     protected $casts = [
         'jenis_layanan' => 'array',
         'sumber_info' => 'array',
+        'alasan_minat' => 'array',
     ];
 
     /**

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\PpdbController;
+use App\Http\Controllers\DevAuthController;
 use App\Http\Controllers\StaticAssetController;
+use App\Support\DevAuth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,6 +33,12 @@ Route::prefix('ppdb')->group(function () {
     Route::get('/storage/{path}', [StaticAssetController::class, 'serveStorage'])->where('path', '.*')->name('ppdb.static.storage');
     Route::get('/images/{path}', [StaticAssetController::class, 'serveImages'])->where('path', '.*')->name('ppdb.static.images');
     Route::get('/uploads/{path}', [StaticAssetController::class, 'serveUploads'])->where('path', '.*')->name('ppdb.static.uploads');
+
+    // Login uji coba lokal tanpa auth service: hanya terdaftar saat APP_ENV=local & AUTH_DEV_BYPASS=true
+    if (DevAuth::configured()) {
+        Route::get('/dev/masuk', [DevAuthController::class, 'index'])->name('ppdb.dev.login');
+        Route::get('/dev/masuk/{role}', [DevAuthController::class, 'switch'])->name('ppdb.dev.login.as');
+    }
 
     // 1. Public Routes
     Route::get('/', [PpdbController::class, 'index'])->name('ppdb.index');
