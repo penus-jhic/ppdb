@@ -36,7 +36,7 @@ return [
     ],
 
     'auth_service' => [
-        'base_url' => env('AUTH_SERVICE_URL', 'http://localhost:3000'),
+        'base_url' => env('AUTH_SERVICE_URL', 'http://localhost:3002'),
 
         // Login uji coba lokal tanpa auth service (App\Support\DevAuth). Hanya berlaku saat APP_ENV=local
         // dan request dari localhost; JANGAN diaktifkan di server.

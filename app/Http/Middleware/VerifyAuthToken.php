@@ -70,7 +70,7 @@ class VerifyAuthToken
         }
 
         // 2. Forward access_token ke Auth Microservice dengan format JSON Payload
-        $baseUrl = config('services.auth_service.base_url', 'http://localhost:3000');
+        $baseUrl = config('services.auth_service.base_url', 'http://localhost:3002');
         $verifyUrl = rtrim($baseUrl, '/').'/api/user/verify';
 
         try {

@@ -9,7 +9,7 @@ class LiveAuthMicroserviceIntegrationTest extends TestCase
 {
     protected function getAuthServerUrl(): string
     {
-        return config('services.auth_service.base_url', 'http://localhost:3000');
+        return config('services.auth_service.base_url', 'http://localhost:3002');
     }
 
     /**

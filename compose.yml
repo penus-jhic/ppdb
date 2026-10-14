@@ -4,22 +4,31 @@ services:
     container_name: ppdb
     env_file:
       - .env
+    # .env berisi nilai untuk dev lokal; nilai khusus Docker ditimpa di sini
+    environment:
+      APP_URL: http://localhost:6767
+      DB_CONNECTION: pgsql
+      DB_HOST: db-ppdb
+      DB_PORT: 5432
+      AUTH_SERVICE_URL: http://user:80
     depends_on:
-      postgres:
+      db-ppdb:
         condition: service_healthy
     networks:
       - web-penus-network
 
-  postgres:
+  # Nama service dibuat unik (bukan "postgres") karena bkk/lpbe/userapi juga ada di web-penus-network
+  db-ppdb:
     image: postgres:17
     container_name: db-ppdb
     environment:
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DB_DATABASE}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
       interval: 5s
       timeout: 5s
       retries: 5
