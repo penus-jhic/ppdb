@@ -39,7 +39,7 @@
             : 'max-w-5xl rounded-[2.5rem] bg-brand-softmist border-brand-ink/10 shadow-softpill px-6 md:px-8 py-3 md:py-3.5'"
         aria-label="Navigasi Utama PPDB"
     >
-        <a href="{{ route('ppdb.index') }}" class="flex items-center gap-2.5 sm:gap-3 group">
+        <a href="/" class="flex items-center gap-2.5 sm:gap-3 group">
             <img
                 src="{{ asset('assets/logosmkpenus.png') }}"
                 alt="Logo SMK Pelita Nusantara"

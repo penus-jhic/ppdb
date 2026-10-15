@@ -227,7 +227,7 @@
 
                         <div class="relative mt-8">
                             <x-sketch.box />
-                            <div class="overflow-x-auto">
+                            <div class="overflow-x-none">
                                 <table class="w-full text-left text-sm">
                                     <thead>
                                         <tr class="relative text-[11px] uppercase tracking-[0.2em] text-brand-darkred">
@@ -277,7 +277,7 @@
 
                         <div class="relative mt-8">
                             <x-sketch.box />
-                            <div class="overflow-x-auto">
+                            <div class="overflow-x-none">
                                 <table class="w-full text-left text-sm">
                                     <thead>
                                         <tr class="relative text-[11px] uppercase tracking-[0.2em] text-brand-darkred">
