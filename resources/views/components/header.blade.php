@@ -31,12 +31,13 @@
     class="fixed left-0 right-0 z-50 flex justify-center pointer-events-none transition-all duration-300 motion-reduce:transition-none no-print"
     :class="atTop ? 'top-0 px-0' : 'top-6 px-4'"
 >
-    {{-- rounded-[2.5rem] (bukan rounded-full) supaya perubahan sudutnya ikut teranimasi dengan halus --}}
+    {{-- rounded-[2.5rem] (bukan rounded-full) supaya perubahan sudutnya ikut teranimasi dengan halus.
+         Saat di atas, padding kiri-kanan menyamakan isi navbar dengan lebar konten halaman (max-w-6xl) --}}
     <nav
         class="pointer-events-auto w-full border flex items-center justify-between gap-4 transition-all duration-300 motion-reduce:transition-none"
         :class="atTop
             ? 'max-w-full rounded-none bg-white border-transparent border-b-brand-ink/10 px-[max(1.5rem,calc((100%-72rem)/2))] py-3 md:py-4'
-            : 'max-w-5xl rounded-[2.5rem] bg-brand-softmist border-brand-ink/10 shadow-softpill px-6 md:px-8 py-3 md:py-3.5'"
+            : 'max-w-6xl rounded-[2.5rem] bg-brand-softmist border-brand-ink/10 shadow-softpill px-6 md:px-8 py-3 md:py-3.5'"
         aria-label="Navigasi Utama PPDB"
     >
         <a href="/" class="flex items-center gap-2.5 sm:gap-3 group">

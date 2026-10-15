@@ -1,7 +1,7 @@
 {{-- Kepala halaman publik PPDB, mengikuti kepala halaman berita landing page (HeroNews.tsx): latar terang,
      breadcrumb, eyebrow berkilau, judul Oswald dengan coretan di kata terakhir. pt besar supaya tidak tertutup navbar.
      Slot default = tombol aksi, slot $aside = ilustrasi di kanan (desktop). --}}
-@props(['eyebrow', 'title', 'description' => null, 'current'])
+@props(['title', 'description' => null, 'current'])
 @php
     // Coretan hanya di kata terakhir: kalau seluruh judul, garisnya ikut melebar saat judul terlipat beberapa baris
     $words = explode(' ', trim($title));
@@ -28,9 +28,6 @@
                 </ol>
             </nav>
 
-            <p class="mt-10 md:mt-12 text-xs sm:text-sm uppercase tracking-[0.25em] font-semibold text-brand-darkred">
-                <x-sketch.sparks>{{ $eyebrow }}</x-sketch.sparks>
-            </p>
             {{-- delay: coretan mulai setelah teks selesai muncul --}}
             <h1 class="mt-4 max-w-4xl text-left font-display text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-wide leading-tight">
                 {{ $firstWords }} <x-sketch.underline size="lg" tone="text-brand-signal" :delay="500">{{ $lastWord }}</x-sketch.underline>

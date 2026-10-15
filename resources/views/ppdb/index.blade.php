@@ -95,14 +95,12 @@
         <div>
             <x-page-hero
                 current="Formulir Pendaftaran"
-                :eyebrow="'Penerimaan Peserta Didik Baru ' . ($activeWave->tahun_ajaran ?? '2027/2028') . ' • ' . ($activeWave->nama ?? 'Gelombang 1')"
                 title="Formulir Pendaftaran Siswa"
                 description="Gerbang awal menuju generasi unggul vokasi Indonesia. Mohon lengkapi seluruh isian data berikut secara cermat dan akurat."
             >
                 <x-slot:aside>
                     {{-- Roket di depan orbit coretan, seperti foto siswa di banner footer landing page --}}
                     <div class="relative w-56 h-56 lg:w-64 lg:h-64 grid place-items-center">
-                        <x-sketch.loop :delay="600" class="text-brand-signal/70 -left-6 -right-6 top-[28%] bottom-[28%] -rotate-12" />
                         <img src="{{ asset('assets/rocket-up.svg') }}" alt="Rocket Vokasi"
                              class="relative w-44 h-44 lg:w-52 lg:h-52 object-contain select-none drop-shadow-lg transition-transform duration-500 hover:scale-105"
                              onerror="this.src='https://ppdb.smkpluspnb.sch.id/assets/images/templates/rocket-up.svg'" />
@@ -285,16 +283,18 @@
                                         <!-- Jenis Kelamin -->
                                         <fieldset>
                                             <legend class="ppdb-label">Jenis Kelamin <span class="text-brand-signal">*</span></legend>
-                                            <div class="grid grid-cols-2 gap-2.5 sm:max-w-md">
-                                                <label class="choice">
+                                            <div class="grid grid-cols-2 gap-2.5">
+                                                <label class="choice group justify-center sm:justify-start">
                                                     <input type="radio" value="L" x-model="formData.jenisKelamin" class="sr-only" />
-                                                    <span class="choice-box rounded-full"><span class="w-2 h-2 rounded-full bg-current"></span></span>
-                                                    Laki-laki
+                                                    <img src="{{ asset('assets/gender_assign/unclicked_male.png') }}" alt="" class="h-12 w-auto group-has-checked:hidden" />
+                                                    <img src="{{ asset('assets/gender_assign/clicked_male.png') }}" alt="" class="hidden h-12 w-auto group-has-checked:block" />
+                                                    <span class="sr-only sm:not-sr-only">Laki-laki</span>
                                                 </label>
-                                                <label class="choice">
+                                                <label class="choice group justify-center sm:justify-start">
                                                     <input type="radio" value="P" x-model="formData.jenisKelamin" class="sr-only" />
-                                                    <span class="choice-box rounded-full"><span class="w-2 h-2 rounded-full bg-current"></span></span>
-                                                    Perempuan
+                                                    <img src="{{ asset('assets/gender_assign/unclicked_female.png') }}" alt="" class="h-12 w-auto group-has-checked:hidden" />
+                                                    <img src="{{ asset('assets/gender_assign/clicked_female.png') }}" alt="" class="hidden h-12 w-auto group-has-checked:block" />
+                                                    <span class="sr-only sm:not-sr-only">Perempuan</span>
                                                 </label>
                                             </div>
                                         </fieldset>
