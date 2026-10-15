@@ -244,41 +244,15 @@
                                             <p x-show="touched.tempatLahir && errors.tempatLahir" class="ppdb-error" x-text="errors.tempatLahir"></p>
                                         </div>
 
-                                        <!-- Tanggal Lahir (Tanggal, Bulan, Tahun) -->
-                                        <fieldset>
-                                            <legend class="ppdb-label">Tanggal Lahir Siswa <span class="text-brand-signal">*</span></legend>
-                                            <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
-                                                <x-dropdown :columns="7">
-                                                    <select id="tanggalLahirHari" x-model="formData.tanggalLahirHari" @blur="handleBlur('tanggalLahirHari')" aria-label="Tanggal"
-                                                            class="ppdb-input appearance-none pl-4 pr-7 sm:pl-5 sm:pr-11" :class="{ 'ppdb-input-error': touched.tanggalLahirHari && errors.tanggalLahirHari }">
-                                                        <option value="" disabled>Tanggal</option>
-                                                        <template x-for="d in 31" :key="d">
-                                                            <option :value="String(d)" x-text="d"></option>
-                                                        </template>
-                                                    </select>
-                                                </x-dropdown>
-                                                <x-dropdown :columns="3">
-                                                    <select id="tanggalLahirBulan" x-model="formData.tanggalLahirBulan" @blur="handleBlur('tanggalLahirBulan')" aria-label="Bulan"
-                                                            class="ppdb-input appearance-none pl-4 pr-7 sm:pl-5 sm:pr-11" :class="{ 'ppdb-input-error': touched.tanggalLahirBulan && errors.tanggalLahirBulan }">
-                                                        <option value="" disabled>Bulan</option>
-                                                        <template x-for="(nama, i) in bulanList" :key="i">
-                                                            <option :value="String(i + 1)" x-text="nama"></option>
-                                                        </template>
-                                                    </select>
-                                                </x-dropdown>
-                                                <x-dropdown :columns="4">
-                                                    <select id="tanggalLahirTahun" x-model="formData.tanggalLahirTahun" @blur="handleBlur('tanggalLahirTahun')" aria-label="Tahun"
-                                                            class="ppdb-input appearance-none pl-4 pr-7 sm:pl-5 sm:pr-11" :class="{ 'ppdb-input-error': touched.tanggalLahirTahun && errors.tanggalLahirTahun }">
-                                                        <option value="" disabled>Tahun</option>
-                                                        <template x-for="y in 20" :key="y">
-                                                            <option :value="String(2013 - (y - 1))" x-text="2013 - (y - 1)"></option>
-                                                        </template>
-                                                    </select>
-                                                </x-dropdown>
-                                            </div>
-                                            <p x-show="(touched.tanggalLahirHari && errors.tanggalLahirHari) || (touched.tanggalLahirBulan && errors.tanggalLahirBulan) || (touched.tanggalLahirTahun && errors.tanggalLahirTahun)"
-                                               class="ppdb-error">Lengkapi tanggal, bulan, dan tahun lahir.</p>
-                                        </fieldset>
+                                        <!-- Tanggal Lahir (satu kolom HH/BB/TTTT, garis miring otomatis) -->
+                                        <div>
+                                            <label for="tanggalLahir" class="ppdb-label">Tanggal Lahir Siswa <span class="text-brand-signal">*</span></label>
+                                            <input type="text" id="tanggalLahir" inputmode="numeric" autocomplete="bday" maxlength="10"
+                                                   :value="formData.tanggalLahir" @input="handleTanggalLahirInput($event)" @blur="handleBlur('tanggalLahir')"
+                                                   placeholder="HH/BB/TTTT, contoh: 17/08/2010"
+                                                   class="ppdb-input" :class="{ 'ppdb-input-error': touched.tanggalLahir && errors.tanggalLahir }" />
+                                            <p x-show="touched.tanggalLahir && errors.tanggalLahir" class="ppdb-error" x-text="errors.tanggalLahir"></p>
+                                        </div>
 
                                         <!-- Jenis Kelamin -->
                                         <fieldset>
@@ -703,9 +677,7 @@
             nisn: '',
             nomorKK: '',
             tempatLahir: '',
-            tanggalLahirHari: '',
-            tanggalLahirBulan: '',
-            tanggalLahirTahun: '',
+            tanggalLahir: '',
             jenisKelamin: 'L',
             alamatLengkap: '',
             sekolahPilihanLevel: 'SMK',
@@ -764,10 +736,29 @@
                 this.validateField(field);
             },
 
+            // Ketik angka saja, garis miring disisipkan otomatis: 17082010 -> 17/08/2010
+            handleTanggalLahirInput(event) {
+                const digits = event.target.value.replace(/\D/g, '').slice(0, 8);
+                const formatted = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)].filter(Boolean).join('/');
+                event.target.value = formatted;
+                this.handleInputChange('tanggalLahir', formatted);
+            },
+
+            // Pecah "HH/BB/TTTT" menjadi { hari, bulan, tahun } tanpa nol di depan (format yang disimpan server),
+            // atau null jika bukan tanggal kalender yang sah
+            parseTanggalLahir(value) {
+                const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value || '');
+                if (!match) return null;
+                const [hari, bulan, tahun] = match.slice(1).map(Number);
+                const date = new Date(tahun, bulan - 1, hari);
+                if (date.getFullYear() !== tahun || date.getMonth() !== bulan - 1 || date.getDate() !== hari) return null;
+                return { hari: String(hari), bulan: String(bulan), tahun: String(tahun), date };
+            },
+
             tanggalLahirLabel() {
-                const { tanggalLahirHari: hari, tanggalLahirBulan: bulan, tanggalLahirTahun: tahun } = this.formData;
-                if (!hari) return '-';
-                return `${hari} ${this.bulanList[Number(bulan) - 1] ?? bulan} ${tahun}`;
+                const parsed = this.parseTanggalLahir(this.formData.tanggalLahir);
+                if (!parsed) return '-';
+                return `${parsed.hari} ${this.bulanList[Number(parsed.bulan) - 1]} ${parsed.tahun}`;
             },
 
             validateField(field) {
@@ -790,18 +781,14 @@
                         if (!val || !val.trim()) this.errors.tempatLahir = 'Tempat lahir wajib diisi.';
                         else delete this.errors.tempatLahir;
                         break;
-                    case 'tanggalLahirHari':
-                        if (!val) this.errors.tanggalLahirHari = 'Pilih tanggal.';
-                        else delete this.errors.tanggalLahirHari;
+                    case 'tanggalLahir': {
+                        const parsed = this.parseTanggalLahir(val);
+                        if (!val) this.errors.tanggalLahir = 'Tanggal lahir wajib diisi.';
+                        else if (!parsed) this.errors.tanggalLahir = 'Tanggal lahir tidak valid. Contoh: 17/08/2010';
+                        else if (parsed.date > new Date() || Number(parsed.tahun) < 1990) this.errors.tanggalLahir = 'Tahun lahir tidak masuk akal, periksa kembali.';
+                        else delete this.errors.tanggalLahir;
                         break;
-                    case 'tanggalLahirBulan':
-                        if (!val) this.errors.tanggalLahirBulan = 'Pilih bulan.';
-                        else delete this.errors.tanggalLahirBulan;
-                        break;
-                    case 'tanggalLahirTahun':
-                        if (!val) this.errors.tanggalLahirTahun = 'Pilih tahun.';
-                        else delete this.errors.tanggalLahirTahun;
-                        break;
+                    }
                     case 'asalSekolah':
                         if (!val || !val.trim()) this.errors.asalSekolah = 'Asal sekolah wajib diisi.';
                         else delete this.errors.asalSekolah;
@@ -827,7 +814,7 @@
             // Kolom wajib di tiap langkah isian
             stepFields(step) {
                 if (step === 1) {
-                    return ['namaLengkap', 'namaPanggilan', 'tempatLahir', 'tanggalLahirHari', 'tanggalLahirBulan', 'tanggalLahirTahun', 'jenisKelamin'];
+                    return ['namaLengkap', 'namaPanggilan', 'tempatLahir', 'tanggalLahir', 'jenisKelamin'];
                 }
                 if (step === 2) {
                     const fields = ['tipePendaftar', 'kelasPilihan', 'jurusan', 'asalSekolah', 'nomorKontakPendaftar', 'nomorKontakOrtu'];
@@ -868,6 +855,9 @@
                     } else if ((f === 'nomorKontakPendaftar' || f === 'nomorKontakOrtu') && v.replace(/\D/g, '').length < 10) {
                         this.errors[f] = 'Minimal 10 digit';
                         isValid = false;
+                    } else if (f === 'tanggalLahir') {
+                        this.validateField(f);
+                        if (this.errors[f]) isValid = false;
                     }
                 });
 
@@ -973,12 +963,13 @@
             showServerErrors(serverErrors) {
                 const fields = Object.keys(serverErrors);
                 fields.forEach(field => {
-                    const key = field.split('.')[0];
+                    // Server memvalidasi tanggalLahirHari/Bulan/Tahun; di formulir ketiganya satu kolom tanggalLahir
+                    const key = field.startsWith('tanggalLahir') ? 'tanggalLahir' : field.split('.')[0];
                     this.errors[key] = serverErrors[field][0];
                     this.touched[key] = true;
                 });
 
-                const step = Math.min(...fields.map(f => this.stepOfField(f.split('.')[0])));
+                const step = Math.min(...fields.map(f => this.stepOfField(f.startsWith('tanggalLahir') ? 'tanggalLahir' : f.split('.')[0])));
                 this.currentStep = step;
                 this.isSubmittedAttempt = true;
                 if (step <= 2) {
@@ -987,6 +978,18 @@
                     this.scrollToStepper();
                     alert(Object.values(serverErrors)[0][0]);
                 }
+            },
+
+            // Server tetap menerima tanggal lahir sebagai tiga kolom terpisah
+            submissionPayload() {
+                const { tanggalLahir, ...rest } = this.formData;
+                const parsed = this.parseTanggalLahir(tanggalLahir);
+                return {
+                    ...rest,
+                    tanggalLahirHari: parsed?.hari ?? '',
+                    tanggalLahirBulan: parsed?.bulan ?? '',
+                    tanggalLahirTahun: parsed?.tahun ?? '',
+                };
             },
 
             async handleSubmitFinal() {
@@ -1003,7 +1006,7 @@
                             'X-CSRF-TOKEN': csrfToken,
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify(this.formData)
+                        body: JSON.stringify(this.submissionPayload())
                     });
 
                     const data = await response.json();

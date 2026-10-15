@@ -28,16 +28,20 @@
         window.matchMedia('(min-width: 64rem)').addEventListener('change', (e) => e.matches && menuOpen && closeMenu());
     "
     @scroll.window.passive="atTop = window.scrollY < 24"
-    class="fixed left-0 right-0 z-50 flex justify-center pointer-events-none transition-all duration-300 motion-reduce:transition-none no-print"
-    :class="atTop ? 'top-0 px-0' : 'top-6 px-4'"
+    data-top
+    :data-top="atTop"
+    class="fixed left-0 right-0 z-50 flex justify-center pointer-events-none transition-all duration-300 motion-reduce:transition-none no-print top-6 px-4 data-[top]:top-0 data-[top]:px-0"
 >
     {{-- rounded-[2.5rem] (bukan rounded-full) supaya perubahan sudutnya ikut teranimasi dengan halus.
-         Saat di atas, padding kiri-kanan menyamakan isi navbar dengan lebar konten halaman (max-w-6xl) --}}
+         Saat di atas, padding kiri-kanan menyamakan isi navbar dengan lebar konten halaman (max-w-6xl).
+         Tampilan "di atas" sudah ikut di HTML lewat atribut data-top, bukan :class, supaya navbar tidak
+         ikut teranimasi saat Alpine selesai dimuat (sama seperti landing page & BKK). --}}
     <nav
-        class="pointer-events-auto w-full border flex items-center justify-between gap-4 transition-all duration-300 motion-reduce:transition-none"
-        :class="atTop
-            ? 'max-w-full rounded-none bg-white border-transparent border-b-brand-ink/10 px-[max(1.5rem,calc((100%-72rem)/2))] py-3 md:py-4'
-            : 'max-w-6xl rounded-[2.5rem] bg-brand-softmist border-brand-ink/10 shadow-softpill px-6 md:px-8 py-3 md:py-3.5'"
+        data-top
+        :data-top="atTop"
+        class="pointer-events-auto w-full border flex items-center justify-between gap-4 transition-all duration-300 motion-reduce:transition-none
+            max-w-6xl rounded-[2.5rem] bg-brand-softmist border-brand-ink/10 shadow-softpill px-6 md:px-8 py-3 md:py-3.5
+            data-[top]:max-w-full data-[top]:rounded-none data-[top]:bg-white data-[top]:border-transparent data-[top]:border-b-brand-ink/10 data-[top]:shadow-none data-[top]:px-[max(1.5rem,calc((100%-72rem)/2))] data-[top]:md:py-4"
         aria-label="Navigasi Utama PPDB"
     >
         <a href="/" class="flex items-center gap-2.5 sm:gap-3 group">
