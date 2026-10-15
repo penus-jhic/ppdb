@@ -132,10 +132,6 @@
         title="Info Biaya PPDB"
         description="Rincian pembiayaan pendidikan serta seragam & atribut lengkap bagi calon peserta didik baru SMK Plus Pelita Nusantara."
     >
-        <a href="#tabel-biaya" class="group btn-primary">
-            Lihat Tabel Pembiayaan
-            <x-sketch.arrow direction="down" class="w-3 h-6 transition-transform group-hover:translate-y-0.5" />
-        </a>
         <button type="button" @click="handleOpenKonsultasi()" class="btn-secondary">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
             Konsultasi Pembiayaan
