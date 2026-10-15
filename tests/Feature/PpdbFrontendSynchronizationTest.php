@@ -48,49 +48,41 @@ class PpdbFrontendSynchronizationTest extends TestCase
     }
 
     /**
-     * STL-02: Public Akomodasi Page renders configured official bank accounts.
+     * STL-02: Halaman Info Biaya tidak menampilkan data rekening bank.
      */
-    public function test_akomodasi_page_displays_official_bank_accounts(): void
+    public function test_info_biaya_page_does_not_display_bank_accounts(): void
     {
-        $customRekening = [
-            [
-                'bank' => 'Bank Mandiri Syariah Khusus',
-                'nomor' => '9999-888-777',
-                'atas_nama' => 'YAYASAN PPDB TEST',
-                'badge' => 'Rekening Utama',
-            ],
-        ];
-        PpdbFeeSetting::set('daftar_rekening', $customRekening, 'Daftar Rekening Bank', 'rekening');
+        PpdbFeeSetting::set('daftar_rekening', [[
+            'bank' => 'Bank Mandiri Syariah Khusus',
+            'nomor' => '9999-888-777',
+            'atas_nama' => 'YAYASAN PPDB TEST',
+        ]], 'Daftar Rekening Bank', 'rekening');
 
         $response = $this->get('/ppdb/akomodasi');
 
         $response->assertStatus(200);
-        $response->assertSee('REKENING RESMI');
-        $response->assertSee('Bank Mandiri Syariah Khusus');
-        $response->assertSee('9999-888-777');
-        $response->assertSee('YAYASAN PPDB TEST');
-        $response->assertSee('Rekening Utama');
+        $response->assertSee('Info Biaya');
+        $response->assertDontSee('REKENING RESMI');
+        $response->assertDontSee('Bank Mandiri Syariah Khusus');
+        $response->assertDontSee('9999-888-777');
     }
 
     /**
-     * STL-03: Public Akomodasi Page displays 5 active majors and no deprecated Multimedia (MM).
+     * STL-03: Halaman Info Biaya hanya memuat rincian biaya dan tanya jawab pembayaran.
      */
-    public function test_akomodasi_page_displays_5_active_majors_without_deprecated_programs(): void
+    public function test_info_biaya_page_only_contains_fee_content(): void
     {
         $response = $this->get('/ppdb/akomodasi');
 
         $response->assertStatus(200);
-        $response->assertSee('5 Kompetensi Keahlian');
-        $response->assertSee('Rekayasa Perangkat Lunak');
-        $response->assertSee('Teknik Komputer dan Jaringan');
-        $response->assertSee('Desain Komunikasi Visual');
-        $response->assertSee('Layanan Perbankan');
-        $response->assertSee('Teknik Otomasi Industri');
+        $response->assertSee('Uraian Pembiayaan PPDB');
+        $response->assertSee('Tanya Jawab Seputar Pembiayaan');
 
-        // Obsolete program names must be absent from headings
-        $response->assertDontSee('4 Kompetensi Keahlian');
-        $response->assertDontSee('Multimedia (MM)');
-        $response->assertDontSee('Perbankan dan Keuangan Mikro (PKM)');
+        $response->assertDontSee('Akreditasi');
+        $response->assertDontSee('5 Kompetensi Keahlian');
+        $response->assertDontSee('Program Unggulan');
+        $response->assertDontSee('Ekstrakurikuler');
+        $response->assertDontSee('Mitra Kerjasama');
     }
 
     /**
@@ -191,7 +183,6 @@ class PpdbFrontendSynchronizationTest extends TestCase
             'tipe_pendaftar' => 'Siswa Baru',
             'kelas_pilihan' => 'Kelas X',
             'jurusan' => 'Rekayasa Perangkat Lunak',
-            'jalur_seleksi' => 'Reguler',
             'asal_sekolah' => 'SMP 1',
             'nomor_kontak_pendaftar' => '081234567890',
             'nomor_kontak_ortu' => '081234567890',

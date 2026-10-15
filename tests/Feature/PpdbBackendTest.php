@@ -9,6 +9,7 @@ use Database\Seeders\PpdbSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class PpdbBackendTest extends TestCase
@@ -164,7 +165,10 @@ class PpdbBackendTest extends TestCase
         // Access dashboard with authenticated token
         $authResponse = $this->withHeader('Authorization', 'Bearer valid_admin_token')->get('/ppdb/dashboard');
         $authResponse->assertStatus(200);
-        $authResponse->assertSee('Halo, Panitia PPDB');
+        $authResponse->assertSee('Panitia PPDB'); // nama dari auth service tampil di header & sapaan
+        $authResponse->assertSee('Gelombang Aktif');
+        $authResponse->assertSee('Status Seleksi');
+        $authResponse->assertSee('Peminat Jurusan');
 
         // Access Gelombang
         $gelombangResponse = $this->withHeader('Authorization', 'Bearer valid_admin_token')->get('/ppdb/dashboard/gelombang');
@@ -226,12 +230,10 @@ class PpdbBackendTest extends TestCase
             'tipePendaftar' => 'Pendaftar Baru',
             'kelasPilihan' => 'Reguler (Pagi)',
             'jurusan' => 'Pengembangan Perangkat Lunak dan Gim (PPLG)',
-            'jalurSeleksi' => 'Jalur Reguler (Tes Minat Bakat)',
             'asalSekolah' => 'SMP Negeri 1 Bogor',
             'nomorKontakPendaftar' => '081234567890',
             'nomorKontakOrtu' => '081234567891',
             'email' => 'ahmad.fakhri@example.com',
-            'ukuranSeragam' => 'L',
         ];
 
         $response = $this->post('/ppdb/daftar', $payload);
@@ -266,7 +268,6 @@ class PpdbBackendTest extends TestCase
             'tipePendaftar' => 'Pendaftar Baru',
             'kelasPilihan' => 'Reguler (Pagi)',
             'jurusan' => 'Desain Komunikasi Visual (DKV)',
-            'jalurSeleksi' => 'Reguler',
             'asalSekolah' => 'SMP Negeri 2 Cibinong',
             'nomorKontakPendaftar' => '081234567892',
             'nomorKontakOrtu' => '081234567893',
@@ -287,6 +288,138 @@ class PpdbBackendTest extends TestCase
             'nama_lengkap' => 'Dewi Sartika Putri',
             'nisn' => '0089123456',
         ]);
+    }
+
+    /**
+     * Payload minimal pendaftaran yang valid (sekolah swasta: tanpa jalur seleksi & ukuran seragam)
+     */
+    protected function validRegistrationPayload(array $overrides = []): array
+    {
+        return array_merge([
+            'namaLengkap' => 'Rizky Pratama',
+            'namaPanggilan' => 'Rizky',
+            'tempatLahir' => 'Bogor',
+            'tanggalLahirHari' => '1',
+            'tanggalLahirBulan' => '2',
+            'tanggalLahirTahun' => '2011',
+            'jenisKelamin' => 'L',
+            'tipePendaftar' => 'Pendaftar Baru',
+            'kelasPilihan' => 'Kelas 10',
+            'jurusan' => 'Rekayasa Perangkat Lunak',
+            'asalSekolah' => 'SMP Negeri 3 Cibinong',
+            'nomorKontakPendaftar' => '081234567800',
+            'nomorKontakOrtu' => '081234567801',
+        ], $overrides);
+    }
+
+    #[DataProvider('invalidEmailProvider')]
+    public function test_registration_rejects_invalid_email(string $email): void
+    {
+        $response = $this->postJson('/ppdb/daftar', $this->validRegistrationPayload(['email' => $email]));
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['email']);
+        $this->assertSame('Format alamat email tidak valid. Contoh: nama@gmail.com', $response->json('errors.email.0'));
+        $this->assertDatabaseMissing('ppdb_registrations', ['nama_lengkap' => 'Rizky Pratama']);
+    }
+
+    public static function invalidEmailProvider(): array
+    {
+        return [
+            'tanpa @' => ['rizky.gmail.com'],
+            'tanpa domain tingkat atas' => ['rizky@gmail'],
+            'dua @' => ['rizky@@gmail.com'],
+            'ada spasi' => ['rizky pratama@gmail.com'],
+            'titik ganda' => ['rizky@gmail..com'],
+        ];
+    }
+
+    public function test_registration_accepts_valid_or_empty_email(): void
+    {
+        $this->postJson('/ppdb/daftar', $this->validRegistrationPayload(['email' => 'rizky.pratama@gmail.co.id']))
+            ->assertOk();
+        $this->postJson('/ppdb/daftar', $this->validRegistrationPayload(['namaLengkap' => 'Tanpa Email']))
+            ->assertOk();
+
+        $this->assertDatabaseHas('ppdb_registrations', ['nama_lengkap' => 'Rizky Pratama', 'email' => 'rizky.pratama@gmail.co.id']);
+        $this->assertDatabaseHas('ppdb_registrations', ['nama_lengkap' => 'Tanpa Email', 'email' => null]);
+    }
+
+    public function test_registration_stores_multiple_sumber_info_and_alasan_minat_without_jalur(): void
+    {
+        $response = $this->postJson('/ppdb/daftar', $this->validRegistrationPayload([
+            'sumberInfo' => ['Brosur', 'Youtube', 'Lain-lain'],
+            'sumberInfoLainnya' => 'Pameran pendidikan',
+            'alasanMinat' => ['Digitalisasi Sekolah', 'Kualitas Guru yang Baik', 'Lainnya'],
+            'alasanMinatLainnya' => 'Dekat tempat kerja orang tua',
+        ]));
+
+        $response->assertOk()->assertJsonMissingPath('data.jalurSeleksi');
+
+        $registration = PpdbRegistration::where('nama_lengkap', 'Rizky Pratama')->firstOrFail();
+        $this->assertSame(['Brosur', 'Youtube', 'Lain-lain'], $registration->sumber_info);
+        $this->assertSame(['Digitalisasi Sekolah', 'Kualitas Guru yang Baik', 'Lainnya'], $registration->alasan_minat);
+        $this->assertSame('Dekat tempat kerja orang tua', $registration->alasan_minat_lainnya);
+        $this->assertNull($registration->jalur_seleksi);
+        $this->assertNull($registration->ukuran_seragam);
+    }
+
+    public function test_registration_rejects_unknown_alasan_and_sumber_options(): void
+    {
+        $this->postJson('/ppdb/daftar', $this->validRegistrationPayload([
+            'sumberInfo' => ['Brosur', 'Radio'],
+            'alasanMinat' => ['Bukan Pilihan'],
+        ]))->assertStatus(422)->assertJsonValidationErrors(['sumberInfo.1', 'alasanMinat.0']);
+    }
+
+    public function test_registration_form_offers_checkbox_lists_and_no_jalur_or_seragam(): void
+    {
+        $response = $this->get('/ppdb');
+
+        $response->assertOk()
+            ->assertSee('Sumber Informasi PPDB')
+            ->assertSee('Alasan Utama Minat Mendaftar')
+            ->assertSee('Reputasi Sekolah Baik')
+            ->assertDontSee('Jalur Seleksi')
+            ->assertDontSee('Ukuran Seragam');
+    }
+
+    public function test_admin_can_update_alasan_minat_as_list(): void
+    {
+        $this->fakeAuthAdmin();
+        $student = PpdbRegistration::firstOrFail();
+
+        $payload = [
+            'nama_lengkap' => $student->nama_lengkap,
+            'nama_panggilan' => $student->nama_panggilan,
+            'tempat_lahir' => $student->tempat_lahir,
+            'tanggal_lahir_hari' => $student->tanggal_lahir_hari,
+            'tanggal_lahir_bulan' => $student->tanggal_lahir_bulan,
+            'tanggal_lahir_tahun' => $student->tanggal_lahir_tahun,
+            'jenis_kelamin' => $student->jenis_kelamin,
+            'tipe_pendaftar' => $student->tipe_pendaftar,
+            'kelas_pilihan' => $student->kelas_pilihan,
+            'jurusan' => $student->jurusan,
+            'asal_sekolah' => $student->asal_sekolah,
+            'nomor_kontak_pendaftar' => '081234567890',
+            'nomor_kontak_ortu' => '081234567891',
+            'status' => $student->status,
+            // Alasan lama milik pendaftar ini tetap boleh dipertahankan bersama pilihan baru
+            'alasan_minat' => [...$student->alasan_minat, 'Reputasi Sekolah Baik'],
+        ];
+
+        $this->withHeaders(['Authorization' => 'Bearer valid-mock-token'])
+            ->put("/ppdb/dashboard/pendaftar/{$student->id}", $payload)
+            ->assertRedirect();
+
+        $this->assertSame([...$student->alasan_minat, 'Reputasi Sekolah Baik'], $student->fresh()->alasan_minat);
+
+        // Semua centang dilepas: alasan dikosongkan
+        unset($payload['alasan_minat']);
+        $this->withHeaders(['Authorization' => 'Bearer valid-mock-token'])
+            ->put("/ppdb/dashboard/pendaftar/{$student->id}", $payload)
+            ->assertRedirect();
+
+        $this->assertSame([], $student->fresh()->alasan_minat);
     }
 
     /**
@@ -520,7 +653,6 @@ class PpdbBackendTest extends TestCase
             'tipe_pendaftar' => 'Pendaftar Baru',
             'kelas_pilihan' => 'Reguler',
             'jurusan' => 'RPL',
-            'jalur_seleksi' => 'Reguler',
             'asal_sekolah' => "\tTabIndentSchool",
             'nomor_kontak_pendaftar' => '+6281234567890',
             'nomor_kontak_ortu' => '081234567891',
@@ -561,5 +693,42 @@ class PpdbBackendTest extends TestCase
         $responseThrottleStatus->assertStatus(429);
 
         Cache::flush();
+    }
+
+    public function test_dashboard_greets_logged_in_user_and_counts_legacy_jurusan_values(): void
+    {
+        Http::fake([
+            '*/api/user/verify' => Http::response([
+                'success' => true,
+                'data' => ['id' => 9, 'username' => 'sari', 'nama_lengkap' => 'Sari Wulandari', 'role' => 'TU', 'status_aktif' => true],
+            ], 200),
+        ]);
+
+        PpdbRegistration::query()->delete();
+
+        $wave = PpdbWave::create([
+            'nama' => 'Gelombang Uji', 'tahun_ajaran' => '2027/2028', 'tanggal_mulai' => now()->subDay(),
+            'tanggal_selesai' => now()->addMonth(), 'kuota' => 100, 'biaya_formulir' => 0, 'is_active' => true,
+        ]);
+        foreach (['Desain Komunikasi Visual', 'Desain Komunikasi Visual (DKV)', 'Jurusan Tidak Dikenal'] as $i => $jurusan) {
+            PpdbRegistration::create([
+                'nomor_registrasi' => 'PPDB-UJI-'.$i, 'nama_lengkap' => 'Siswa '.$i, 'nama_panggilan' => 'S'.$i,
+                'tempat_lahir' => 'Bogor', 'tanggal_lahir_hari' => '1', 'tanggal_lahir_bulan' => '1', 'tanggal_lahir_tahun' => '2011',
+                'jenis_kelamin' => 'L', 'tipe_pendaftar' => 'Siswa Baru', 'kelas_pilihan' => 'X', 'jurusan' => $jurusan,
+                'asal_sekolah' => 'SMP Uji', 'nomor_kontak_pendaftar' => '0812', 'nomor_kontak_ortu' => '0813',
+                'status' => 'menunggu_verifikasi',
+                'gelombang_id' => $wave->id,
+            ]);
+        }
+
+        $html = $this->withHeader('Authorization', 'Bearer t')->get('/ppdb/dashboard');
+        $html->assertStatus(200)->assertSee('Sari')->assertDontSee('Halo, Panitia PPDB');
+
+        $json = $this->withHeader('Authorization', 'Bearer t')->getJson('/ppdb/dashboard');
+        $json->assertOk()
+            ->assertJsonPath('data.stats.total_pendaftar', 3)
+            ->assertJsonPath('data.stats.menunggu_verifikasi', 3)
+            ->assertJsonPath('data.per_jurusan.Desain Komunikasi Visual', 2)
+            ->assertJsonPath('data.per_jurusan.Lainnya', 1);
     }
 }

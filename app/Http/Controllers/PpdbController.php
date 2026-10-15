@@ -8,8 +8,10 @@ use App\Models\PpdbRegistration;
 use App\Models\PpdbWave;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PpdbController extends Controller
@@ -35,8 +37,10 @@ class PpdbController extends Controller
         $waves = PpdbWave::orderBy('tanggal_mulai')->get();
         $totalPendaftar = PpdbRegistration::count();
         $majors = $this->majors;
+        $sumberInfoOptions = PpdbRegistration::SUMBER_INFO_OPTIONS;
+        $alasanMinatOptions = PpdbRegistration::ALASAN_MINAT_OPTIONS;
 
-        return view('ppdb.index', compact('activeWave', 'waves', 'totalPendaftar', 'majors'));
+        return view('ppdb.index', compact('activeWave', 'waves', 'totalPendaftar', 'majors', 'sumberInfoOptions', 'alasanMinatOptions'));
     }
 
     /**
@@ -63,17 +67,23 @@ class PpdbController extends Controller
             'tanggalMulaiMasuk' => 'nullable|string',
             'kelasPilihan' => 'required|string',
             'jurusan' => 'required|string',
-            'jalurSeleksi' => 'required|string',
             'asalSekolah' => 'required|string|max:255',
             'nomorKontakPendaftar' => 'required|string|min:10|max:20',
             'nomorKontakOrtu' => 'required|string|min:10|max:20',
-            'email' => 'nullable|email|max:150',
+            // rfc,filter: menolak salah ketik umum seperti "nama@gmail" (tanpa .com) yang lolos aturan email biasa
+            'email' => 'nullable|email:rfc,filter|max:150',
             'jenisLayanan' => 'nullable|array',
             'sumberInfo' => 'nullable|array',
+            'sumberInfo.*' => ['string', Rule::in(PpdbRegistration::SUMBER_INFO_OPTIONS)],
             'sumberInfoLainnya' => 'nullable|string|max:255',
-            'alasanMinat' => 'nullable|string|max:255',
+            'alasanMinat' => 'nullable|array',
+            'alasanMinat.*' => ['string', Rule::in(PpdbRegistration::ALASAN_MINAT_OPTIONS)],
             'alasanMinatLainnya' => 'nullable|string|max:255',
-            'ukuranSeragam' => 'nullable|string|max:10',
+        ], [
+            'email.email' => 'Format alamat email tidak valid. Contoh: nama@gmail.com',
+            'email.max' => 'Alamat email maksimal 150 karakter.',
+            'sumberInfo.*.in' => 'Pilihan sumber informasi tidak dikenal.',
+            'alasanMinat.*.in' => 'Pilihan alasan minat tidak dikenal.',
         ]);
 
         $activeWave = PpdbWave::where('is_active', true)->first();
@@ -106,7 +116,6 @@ class PpdbController extends Controller
             'tanggal_mulai_masuk' => $validated['tanggalMulaiMasuk'] ?? null,
             'kelas_pilihan' => $validated['kelasPilihan'],
             'jurusan' => $validated['jurusan'],
-            'jalur_seleksi' => $validated['jalurSeleksi'],
             'asal_sekolah' => $validated['asalSekolah'],
             'nomor_kontak_pendaftar' => $validated['nomorKontakPendaftar'],
             'nomor_kontak_ortu' => $validated['nomorKontakOrtu'],
@@ -114,9 +123,8 @@ class PpdbController extends Controller
             'jenis_layanan' => $validated['jenisLayanan'] ?? [],
             'sumber_info' => $validated['sumberInfo'] ?? [],
             'sumber_info_lainnya' => $validated['sumberInfoLainnya'] ?? null,
-            'alasan_minat' => $validated['alasanMinat'] ?? null,
+            'alasan_minat' => $validated['alasanMinat'] ?? [],
             'alasan_minat_lainnya' => $validated['alasanMinatLainnya'] ?? null,
-            'ukuran_seragam' => $validated['ukuranSeragam'] ?? null,
             'status' => 'menunggu_verifikasi',
         ]);
 
@@ -134,7 +142,6 @@ class PpdbController extends Controller
                     'nisn' => $registration->nisn,
                     'jurusan' => $registration->jurusan,
                     'asalSekolah' => $registration->asal_sekolah,
-                    'jalurSeleksi' => $registration->jalur_seleksi,
                 ],
             ]);
         }
@@ -333,15 +340,12 @@ class PpdbController extends Controller
             'kelas_pilihan' => $pendaftar->kelas_pilihan,
             'kelasPilihan' => $pendaftar->kelas_pilihan,
             'jurusan' => $pendaftar->jurusan,
-            'jalur_seleksi' => $pendaftar->jalur_seleksi,
-            'jalurSeleksi' => $pendaftar->jalur_seleksi,
             'tipe_pendaftar' => $pendaftar->tipe_pendaftar,
             'sekolah_pilihan_level' => $pendaftar->sekolah_pilihan_level,
             'sekolah_pilihan_unit' => $pendaftar->sekolah_pilihan_unit,
             'nomor_kontak_pendaftar' => $pendaftar->nomor_kontak_pendaftar,
             'nomor_kontak_ortu' => $pendaftar->nomor_kontak_ortu,
             'email' => $pendaftar->email,
-            'ukuran_seragam' => $pendaftar->ukuran_seragam,
             'gelombang' => $pendaftar->gelombang?->nama ?? 'Gelombang 1',
             'status' => $pendaftar->status,
             'status_label' => $statusLabel,
@@ -389,9 +393,6 @@ class PpdbController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-        if ($request->filled('jalur')) {
-            $query->where('jalur_seleksi', $request->jalur);
-        }
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -424,12 +425,10 @@ class PpdbController extends Controller
                 'Tempat Lahir',
                 'Tgl Lahir',
                 'Kompetensi Keahlian (Jurusan)',
-                'Jalur Seleksi',
                 'Asal Sekolah',
                 'No. HP Siswa',
                 'No. HP Orang Tua',
                 'Email',
-                'Ukuran Seragam',
                 'Alamat Lengkap',
                 'Tgl Mendaftar',
                 'Catatan Panitia',
@@ -448,12 +447,10 @@ class PpdbController extends Controller
                     $row->tempat_lahir,
                     $row->tanggal_lahir_formatted,
                     $row->jurusan,
-                    $row->jalur_seleksi,
                     $row->asal_sekolah,
                     $row->nomor_kontak_pendaftar,
                     $row->nomor_kontak_ortu,
                     $row->email ?? '-',
-                    $row->ukuran_seragam ?? '-',
                     $row->alamat_lengkap ?? '-',
                     $row->created_at ? $row->created_at->format('Y-m-d H:i') : '-',
                     $row->catatan ?? '-',
@@ -495,36 +492,80 @@ class PpdbController extends Controller
     {
         $authUser = $request->auth_user ?? $request->input('auth_user');
 
+        $statusCounts = PpdbRegistration::query()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $totalPendaftar = (int) $statusCounts->sum();
+        $totalMenunggu = (int) ($statusCounts['menunggu_verifikasi'] ?? 0);
+        $totalTerverifikasi = (int) ($statusCounts['terverifikasi'] ?? 0);
+        $totalLulus = (int) ($statusCounts['lulus_seleksi'] ?? 0);
+        $totalTidakLulus = (int) ($statusCounts['tidak_lulus'] ?? 0);
+        $todayCount = PpdbRegistration::whereDate('created_at', Carbon::today())->count();
+
+        $activeWave = PpdbWave::where('is_active', true)->withCount('pendaftar')->first();
+        $waves = PpdbWave::withCount('pendaftar')->orderBy('tanggal_mulai')->get();
+        $totalPengumuman = PpdbAnnouncement::count();
+
+        $jurusanCounts = $this->countPerMajor(
+            PpdbRegistration::query()->selectRaw('jurusan, count(*) as total')->groupBy('jurusan')->pluck('total', 'jurusan')
+        );
+
+        $genderCounts = PpdbRegistration::query()
+            ->selectRaw('jenis_kelamin, count(*) as total')
+            ->groupBy('jenis_kelamin')
+            ->pluck('total', 'jenis_kelamin');
+
+        $topSekolah = PpdbRegistration::query()
+            ->whereNotNull('asal_sekolah')
+            ->selectRaw('asal_sekolah, count(*) as total')
+            ->groupBy('asal_sekolah')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->pluck('total', 'asal_sekolah')
+            ->toArray();
+
+        // Tren 14 hari terakhir; dikelompokkan di PHP supaya sama di MySQL, PostgreSQL, maupun SQLite
+        $trendStart = Carbon::today()->subDays(13);
+        $dailyCounts = PpdbRegistration::where('created_at', '>=', $trendStart)
+            ->pluck('created_at')
+            ->countBy(fn ($date) => Carbon::parse($date)->toDateString());
+        $trend = collect(range(0, 13))->map(function (int $offset) use ($trendStart, $dailyCounts) {
+            $day = $trendStart->copy()->addDays($offset);
+
+            return ['date' => $day, 'total' => (int) ($dailyCounts[$day->toDateString()] ?? 0)];
+        })->all();
+
+        $recentPendaftar = PpdbRegistration::with('gelombang')->latest()->take(7)->get();
+
+        $majors = $this->majors;
+
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'data' => [
                     'user' => $authUser,
+                    'stats' => [
+                        'total_pendaftar' => $totalPendaftar,
+                        'menunggu_verifikasi' => $totalMenunggu,
+                        'terverifikasi' => $totalTerverifikasi,
+                        'lulus_seleksi' => $totalLulus,
+                        'tidak_lulus' => $totalTidakLulus,
+                        'hari_ini' => $todayCount,
+                        'total_pengumuman' => $totalPengumuman,
+                    ],
+                    'per_jurusan' => $jurusanCounts,
+                    'per_gelombang' => $waves->map(fn (PpdbWave $wave) => [
+                        'nama' => $wave->nama,
+                        'kuota' => $wave->kuota,
+                        'pendaftar' => $wave->pendaftar_count,
+                        'is_active' => $wave->is_active,
+                    ]),
+                    'tren_harian' => collect($trend)->map(fn ($row) => ['tanggal' => $row['date']->toDateString(), 'total' => $row['total']]),
                 ],
             ]);
         }
-
-        $totalPendaftar = PpdbRegistration::count();
-        $totalTerverifikasi = PpdbRegistration::where('status', 'terverifikasi')->count();
-        $totalMenunggu = PpdbRegistration::where('status', 'menunggu_verifikasi')->count();
-        $totalLulus = PpdbRegistration::where('status', 'lulus_seleksi')->count();
-        $todayCount = PpdbRegistration::whereDate('created_at', Carbon::today())->count();
-
-        // Active Wave
-        $activeWave = PpdbWave::where('is_active', true)->first();
-        $waves = PpdbWave::withCount('pendaftar')->get();
-        $totalPengumuman = PpdbAnnouncement::count();
-
-        // Distribusi per jurusan
-        $jurusanCounts = PpdbRegistration::selectRaw('jurusan, count(*) as count')
-            ->groupBy('jurusan')
-            ->pluck('count', 'jurusan')
-            ->toArray();
-
-        // 7 Pendaftar terbaru untuk tabel ringkasan
-        $recentPendaftar = PpdbRegistration::with('gelombang')->latest()->take(7)->get();
-
-        $majors = $this->majors;
 
         return view('ppdb.dashboard.index', compact(
             'authUser',
@@ -532,14 +573,54 @@ class PpdbController extends Controller
             'totalTerverifikasi',
             'totalMenunggu',
             'totalLulus',
+            'totalTidakLulus',
             'todayCount',
             'activeWave',
             'waves',
             'totalPengumuman',
             'jurusanCounts',
+            'genderCounts',
+            'topSekolah',
+            'trend',
             'recentPendaftar',
             'majors'
         ));
+    }
+
+    /**
+     * Petakan nilai kolom jurusan ke daftar jurusan resmi ($this->majors). Nilai lama seperti
+     * "Desain Komunikasi Visual (DKV)" atau kode "DKV" tetap terhitung; sisanya masuk "Lainnya".
+     *
+     * @param  Collection<string, int>  $rawCounts
+     * @return array<string, int>
+     */
+    protected function countPerMajor($rawCounts): array
+    {
+        $counts = array_fill_keys(array_keys($this->majors), 0);
+        $lainnya = 0;
+
+        foreach ($rawCounts as $jurusan => $total) {
+            $match = collect($this->majors)->search(function (string $code, string $name) use ($jurusan) {
+                $value = strtolower(trim((string) $jurusan));
+
+                return $value === strtolower($name)
+                    || $value === strtolower($code)
+                    || str_starts_with($value, strtolower($name))
+                    || str_contains($value, '('.strtolower($code).')');
+            });
+
+            if ($match !== false) {
+                $counts[$match] += (int) $total;
+            } else {
+                $lainnya += (int) $total;
+            }
+        }
+
+        if ($lainnya > 0) {
+            $counts['Lainnya'] = $lainnya;
+        }
+
+        return $counts;
     }
 
     /**
@@ -551,7 +632,6 @@ class PpdbController extends Controller
         $search = $request->get('search');
         $jurusan = $request->get('jurusan');
         $status = $request->get('status');
-        $jalur = $request->get('jalur');
         $gelombangId = $request->get('gelombang');
         $sort = $request->get('sort', 'terbaru');
 
@@ -564,7 +644,6 @@ class PpdbController extends Controller
             'nisn',
             'nomor_kk',
             'jurusan',
-            'jalur_seleksi',
             'status',
             'created_at',
         ]);
@@ -586,10 +665,6 @@ class PpdbController extends Controller
 
         if ($status) {
             $query->where('status', $status);
-        }
-
-        if ($jalur) {
-            $query->where('jalur_seleksi', $jalur);
         }
 
         if ($gelombangId) {
@@ -633,7 +708,6 @@ class PpdbController extends Controller
             'search',
             'jurusan',
             'status',
-            'jalur',
             'gelombangId',
             'sort',
             'majors',
@@ -654,13 +728,15 @@ class PpdbController extends Controller
         $nextStudent = PpdbRegistration::where('id', '>', $id)->orderBy('id', 'asc')->first();
 
         $majors = $this->majors;
+        $alasanMinatOptions = PpdbRegistration::ALASAN_MINAT_OPTIONS;
 
         return view('ppdb.dashboard.detail', compact(
             'pendaftar',
             'prevStudent',
             'nextStudent',
             'majors',
-            'waves'
+            'waves',
+            'alasanMinatOptions'
         ));
     }
 
@@ -689,15 +765,20 @@ class PpdbController extends Controller
             'gelombang_id' => 'nullable|exists:ppdb_waves,id',
             'kelas_pilihan' => 'required|string',
             'jurusan' => 'required|string',
-            'jalur_seleksi' => 'required|string',
             'asal_sekolah' => 'required|string|max:255',
             'nomor_kontak_pendaftar' => 'required|string|min:10|max:20',
             'nomor_kontak_ortu' => 'required|string|min:10|max:20',
-            'email' => 'nullable|email|max:150',
-            'ukuran_seragam' => 'nullable|string|max:10',
+            'email' => 'nullable|email:rfc,filter|max:150',
+            'alasan_minat' => 'nullable|array',
+            // Alasan lama milik pendaftar ini (sebelum ada daftar pilihan) tetap boleh dipertahankan
+            'alasan_minat.*' => ['string', Rule::in(array_merge(PpdbRegistration::ALASAN_MINAT_OPTIONS, $pendaftar->alasan_minat ?? []))],
+            'alasan_minat_lainnya' => 'nullable|string|max:255',
             'status' => 'required|in:menunggu_verifikasi,terverifikasi,lulus_seleksi,tidak_lulus',
             'catatan' => 'nullable|string|max:1000',
         ]);
+
+        // Checkbox yang semuanya tidak dicentang tidak ikut terkirim, jadi kosongkan secara eksplisit
+        $validated['alasan_minat'] ??= [];
 
         $pendaftar->update($validated);
 

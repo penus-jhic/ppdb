@@ -40,11 +40,11 @@ Semua rute diawali dengan prefix `/ppdb`:
 | `GET/POST`| `/ppdb/logout` | Menghapus cookie `access_token` dan keluar sesi |
 
 ### 🔒 Rute Admin Dashboard (Dilindungi `verify.auth`)
-| `GET` | `/ppdb/dashboard` | Statistik & KPI (total pendaftar, per jurusan, per jalur, status seleksi) |
+| `GET` | `/ppdb/dashboard` | Statistik & KPI (total pendaftar, per jurusan, per gelombang, status seleksi) |
 | `GET` | `/ppdb/dashboard/pendaftar` | Manajemen data pendaftar (Filter, Pencarian, Pagination) |
 | `GET` | `/ppdb/dashboard/pendaftar/export` | **Export Data Pendaftar ke format CSV** (UTF-8 BOM Excel-ready) |
-| `GET` | `/ppdb/dashboard/pendaftar/{id}` | Detail lengkap biodata, wali, asal sekolah, ukuran seragam, dan riwayat |
-| `PUT` | `/ppdb/dashboard/pendaftar/{id}` | Edit data biodata & preferensi jurusan/jalur siswa |
+| `GET` | `/ppdb/dashboard/pendaftar/{id}` | Detail lengkap biodata, wali, asal sekolah, sumber informasi, alasan minat, dan riwayat |
+| `PUT` | `/ppdb/dashboard/pendaftar/{id}` | Edit data biodata & preferensi jurusan & alasan minat siswa |
 | `PATCH` | `/ppdb/dashboard/pendaftar/{id}/status` | Ubah status seleksi & input catatan verifikasi/observasi |
 | `DELETE` | `/ppdb/dashboard/pendaftar/{id}` | Hapus data pendaftar |
 | `GET` | `/ppdb/dashboard/gelombang` | Daftar & manajemen gelombang PPDB (kuota, tanggal, biaya formulir) |
@@ -65,7 +65,7 @@ Semua rute diawali dengan prefix `/ppdb`:
 ## 🗄️ Struktur Database & Model
 
 1. **`ppdb_registrations`** (Model: `PpdbRegistration`):
-   - Data biodata calon siswa, NISN, No KK, kontak siswa & orang tua, jurusan pilihan, kelas, jalur, ukuran seragam, catatan panitia.
+   - Data biodata calon siswa, NISN, No KK, kontak siswa & orang tua, jurusan pilihan, kelas, sumber informasi & alasan minat (keduanya daftar JSON, boleh lebih dari satu), catatan panitia. Sekolah swasta: formulir tidak menanyakan jalur seleksi & ukuran seragam (kolom `jalur_seleksi`/`ukuran_seragam` hanya menyimpan data lama, nullable).
    - Status: `menunggu_verifikasi`, `terverifikasi`, `lulus_seleksi`, `tidak_lulus`.
    - Relasi: `belongsTo(PpdbWave::class, 'gelombang_id')`.
 
@@ -90,7 +90,7 @@ Semua rute diawali dengan prefix `/ppdb`:
 - Fitur:
   - Header resmi berlogo Yayasan & SMK Plus Pelita Nusantara.
   - Simulasi Barcode & QR Code verifikasi.
-  - Rincian biodata, jalur seleksi, dan kompetensi keahlian.
+  - Rincian biodata, kelas pilihan, dan kompetensi keahlian.
   - Jadwal & petunjuk tes observasi / wawancara.
   - Kolom tanda tangan resmi Ketua Panitia PPDB & Calon Peserta Didik.
   - Tombol auto-print dengan `@media print` layout A4 rapi tanpa header browser yang mengganggu.
