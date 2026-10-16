@@ -38,35 +38,11 @@
     $genderL = (int) ($genderCounts['L'] ?? 0);
     $genderP = (int) ($genderCounts['P'] ?? 0);
 
-    $card = 'bg-white rounded-card border border-brand-ink/10 shadow-[0_4px_20px_-4px_rgb(36_16_18_/_0.08)]';
-    $tabs = [
-        ['label' => 'Overview', 'route' => 'ppdb.dashboard'],
-        ['label' => 'Data Pendaftar', 'route' => 'ppdb.dashboard.pendaftar'],
-        ['label' => 'Gelombang', 'route' => 'ppdb.dashboard.gelombang'],
-        ['label' => 'Pengumuman', 'route' => 'ppdb.dashboard.pengumuman'],
-        ['label' => 'Biaya & Akomodasi', 'route' => 'ppdb.dashboard.akomodasi'],
-    ];
+    $card = 'bg-white rounded-card border border-brand-ink/10 shadow-card';
 @endphp
 
 @section('content')
 <div class="space-y-8">
-
-    {{-- SUB NAVIGASI --}}
-    <nav class="flex flex-wrap items-center justify-between gap-3 print:hidden" aria-label="Sub menu PPDB">
-        <div class="flex flex-wrap gap-1.5">
-            @foreach($tabs as $tab)
-                <a href="{{ route($tab['route']) }}" class="px-4 h-9 inline-flex items-center rounded-full text-xs font-semibold transition-colors {{ request()->routeIs($tab['route']) ? 'bg-brand-ink text-white' : 'bg-white border border-brand-ink/10 text-brand-ink hover:bg-brand-softmist' }}">{{ $tab['label'] }}</a>
-            @endforeach
-        </div>
-        <div class="flex gap-2">
-            <a href="{{ route('ppdb.dashboard.pendaftar.export') }}" class="h-9 px-4 rounded-full bg-white border border-brand-ink/15 text-xs font-semibold text-brand-ink hover:bg-brand-softmist inline-flex items-center gap-1.5 transition-colors">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-brand-darkred"></i> Export CSV
-            </a>
-            <button type="button" onclick="window.print()" class="h-9 px-4 rounded-full bg-white border border-brand-ink/15 text-xs font-semibold text-brand-ink hover:bg-brand-softmist inline-flex items-center gap-1.5 transition-colors cursor-pointer">
-                <i data-lucide="printer" class="w-3.5 h-3.5 text-brand-darkred"></i> Cetak Rekap
-            </button>
-        </div>
-    </nav>
 
     {{-- HERO --}}
     <section class="{{ $card }} relative p-6 sm:p-8 overflow-hidden">
@@ -78,8 +54,7 @@
                     {{ $greet }}, <x-sketch.underline size="md">{{ $firstName }}</x-sketch.underline>
                 </h1>
                 <p class="mt-5 text-sm sm:text-[15px] text-brand-ink/70 leading-relaxed max-w-2xl">
-                    Sudah ada <b class="text-brand-ink">{{ number_format($totalPendaftar) }} calon siswa</b> yang mendaftar
-                    @if($todayCount > 0)(<b class="text-brand-ink">{{ $todayCount }}</b> hari ini)@endif.
+                    Sudah ada <b class="text-brand-ink">{{ number_format($totalPendaftar) }} calon siswa</b> yang mendaftar@if($todayCount > 0) (<b class="text-brand-ink">{{ $todayCount }}</b> hari ini)@endif.
                     @if($totalMenunggu > 0)
                         <b class="text-brand-darkred">{{ $totalMenunggu }} berkas</b> masih menunggu verifikasi panitia.
                     @else
@@ -91,13 +66,20 @@
                         Verifikasi Berkas <x-sketch.arrow class="w-6 h-3" />
                     </a>
                     <a href="{{ route('ppdb.dashboard.pengumuman') }}" class="inline-flex items-center gap-2 h-10 px-5 rounded-full border border-brand-ink/15 bg-white text-brand-ink text-sm font-semibold hover:bg-brand-softmist transition-colors">
-                        <i data-lucide="megaphone" class="w-4 h-4"></i> Buat Pengumuman
+                        <i data-lucide="megaphone" class="w-4 h-4 text-brand-darkred"></i> Buat Pengumuman
                     </a>
+                    <span class="hidden sm:block w-px h-6 bg-brand-ink/10 self-center mx-0.5 print:hidden" aria-hidden="true"></span>
+                    <a href="{{ route('ppdb.dashboard.pendaftar.export') }}" title="Export data pendaftar (CSV)" aria-label="Export CSV" class="print:hidden inline-flex items-center justify-center gap-2 h-10 min-w-10 px-3 2xl:px-4 rounded-full text-brand-ink text-sm font-semibold hover:bg-brand-softmist transition-colors">
+                        <i data-lucide="download" class="w-4 h-4 text-brand-ink/60"></i><span class="hidden 2xl:inline">Export CSV</span>
+                    </a>
+                    <button type="button" onclick="window.print()" title="Cetak rekap dashboard" aria-label="Cetak Rekap" class="print:hidden inline-flex items-center justify-center gap-2 h-10 min-w-10 px-3 2xl:px-4 rounded-full text-brand-ink text-sm font-semibold hover:bg-brand-softmist transition-colors cursor-pointer">
+                        <i data-lucide="printer" class="w-4 h-4 text-brand-ink/60"></i><span class="hidden 2xl:inline">Cetak Rekap</span>
+                    </button>
                 </div>
             </div>
 
             {{-- Gelombang aktif --}}
-            <div class="relative rounded-card bg-[#F5F4F2] p-5">
+            <div class="relative rounded-card bg-brand-paper p-5">
                 <x-sketch.corner class="-left-2 -top-2 w-20 h-8" />
                 <x-sketch.corner :delay="350" class="-right-2 -bottom-2 rotate-180 w-20 h-8" />
                 <div class="flex items-center justify-between gap-2">
@@ -168,7 +150,7 @@
 
         <div class="{{ $card }} xl:col-span-5 p-6">
             <h2 class="font-display font-bold text-xl uppercase tracking-wide text-brand-ink"><x-sketch.underline size="sm">Status Seleksi</x-sketch.underline></h2>
-            <div class="mt-6 flex h-3 rounded-full overflow-hidden bg-[#F5F4F2]" role="img" aria-label="Komposisi status seleksi">
+            <div class="mt-6 flex h-3 rounded-full overflow-hidden bg-brand-paper" role="img" aria-label="Komposisi status seleksi">
                 @foreach($statusRows as $row)
                     @if($row['total'] > 0)
                         <div class="{{ $row['tone'] }} h-full border-r-2 border-white last:border-r-0" style="width: {{ $row['total'] / max(1, $totalPendaftar) * 100 }}%"></div>
@@ -178,7 +160,7 @@
             <ul class="mt-5 space-y-2.5">
                 @foreach($statusRows as $row)
                     <li>
-                        <a href="{{ route('ppdb.dashboard.pendaftar', ['status' => $row['key']]) }}" class="flex items-center gap-3 text-sm rounded-lg px-2 py-1 -mx-2 hover:bg-[#F5F4F2] transition-colors">
+                        <a href="{{ route('ppdb.dashboard.pendaftar', ['status' => $row['key']]) }}" class="flex items-center gap-3 text-sm rounded-lg px-2 py-1 -mx-2 hover:bg-brand-paper transition-colors">
                             <span class="w-2.5 h-2.5 rounded-full {{ $row['tone'] }}"></span>
                             <span class="flex-1 text-brand-ink/80">{{ $row['label'] }}</span>
                             <span class="font-display font-bold text-base text-brand-ink">{{ $row['total'] }}</span>
@@ -188,11 +170,11 @@
                 @endforeach
             </ul>
             <div class="mt-5 pt-4 border-t border-brand-ink/10 grid grid-cols-2 gap-3 text-xs">
-                <div class="rounded-xl bg-[#F5F4F2] p-3">
+                <div class="rounded-xl bg-brand-paper p-3">
                     <span class="text-brand-ink/60">Laki-laki</span>
                     <span class="block font-display font-bold text-2xl text-brand-ink">{{ $genderL }}</span>
                 </div>
-                <div class="rounded-xl bg-[#F5F4F2] p-3">
+                <div class="rounded-xl bg-brand-paper p-3">
                     <span class="text-brand-ink/60">Perempuan</span>
                     <span class="block font-display font-bold text-2xl text-brand-ink">{{ $genderP }}</span>
                 </div>
@@ -212,7 +194,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-sm min-w-[560px]">
                     <thead>
-                        <tr class="text-left text-[11px] font-bold uppercase tracking-wider text-brand-ink/50 border-y border-brand-ink/10 bg-[#F5F4F2]/60">
+                        <tr class="text-left text-[11px] font-bold uppercase tracking-wider text-brand-ink/50 border-y border-brand-ink/10 bg-brand-paper/60">
                             <th class="px-6 py-2.5">Calon Siswa</th>
                             <th class="px-3 py-2.5">Jurusan</th>
                             <th class="px-3 py-2.5">Status</th>
@@ -222,7 +204,7 @@
                     <tbody class="divide-y divide-brand-ink/5">
                         @forelse($recentPendaftar as $student)
                             @php $badge = $student->status_badge; @endphp
-                            <tr class="hover:bg-[#F5F4F2]/50">
+                            <tr class="hover:bg-brand-paper/50">
                                 <td class="px-6 py-3">
                                     <div class="font-semibold text-brand-ink truncate max-w-[220px]">{{ $student->nama_lengkap }}</div>
                                     <div class="text-xs text-brand-ink/60"><span class="tabular-nums text-brand-darkred">{{ $student->nomor_registrasi }}</span> · {{ \Illuminate\Support\Str::limit($student->asal_sekolah, 24) }}</div>
@@ -266,7 +248,7 @@
                                 </span>
                                 <span class="shrink-0"><b class="font-display font-bold text-base text-brand-ink">{{ $count }}</b><span class="text-xs text-brand-ink/50"> / {{ $kuotaPerJurusan }}</span></span>
                             </div>
-                            <div class="mt-1.5 h-2 rounded-full bg-[#F5F4F2] overflow-hidden">
+                            <div class="mt-1.5 h-2 rounded-full bg-brand-paper overflow-hidden">
                                 <div class="h-full rounded-full {{ $fill >= 100 ? 'bg-brand-ink' : 'bg-brand-darkred' }}" style="width: {{ $fill }}%"></div>
                             </div>
                         </a>
@@ -294,7 +276,7 @@
                             </span>
                             <span class="text-xs text-brand-ink/60">{{ $wave->pendaftar_count }} / {{ $wave->kuota }}</span>
                         </div>
-                        <div class="mt-1.5 h-2 rounded-full bg-[#F5F4F2] overflow-hidden">
+                        <div class="mt-1.5 h-2 rounded-full bg-brand-paper overflow-hidden">
                             <div class="h-full rounded-full {{ $wave->is_active ? 'bg-brand-darkred' : 'bg-brand-ink/25' }}" style="width: {{ $fill }}%"></div>
                         </div>
                         <p class="mt-1 text-[11px] text-brand-ink/50">{{ $wave->periode_formatted }}</p>

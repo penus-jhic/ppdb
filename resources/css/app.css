@@ -39,6 +39,10 @@
   --color-brand-warmred: #D04A43;
   --color-brand-rose: #A66B6E;
   --color-brand-white: #FFFFFF;
+  --color-brand-paper: #F5F4F2;
+  --color-brand-navy: #1E293B;
+  --color-brand-blue: #2563EB;
+  --color-brand-muted: #6F5E60;
 
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Oswald", ui-sans-serif, system-ui, sans-serif;
@@ -50,6 +54,7 @@
   --radius-3xl: 24px;
 
   --shadow-softpill: 0 8px 30px -8px rgba(36, 16, 18, 0.18);
+  --shadow-card: 0 4px 20px -4px rgb(15 23 42 / 0.06);
   --shadow-editorial: 0 24px 48px rgba(0, 0, 0, 0.08);
 
   --letter-spacing-tighter: -0.02em;
@@ -133,6 +138,25 @@
   [aria-disabled="true"] {
     cursor: not-allowed;
   }
+}
+
+/* ========================================================
+   Palet dashboard bersama (panel admin PPDB, BKK, dan CMS landing page)
+   Maroon tetap warna utama; tinta & permukaan gelap memakai navy, netral memakai slate.
+   Dipasang lewat kelas "dash-theme" di <body> layout admin, jadi halaman publik PPDB tidak berubah.
+   Nilai yang sama ada di lpfe/src/styles/global.css (.dash-theme) dan bkk/resources/views/partials/dashboard-theme.blade.php.
+   ======================================================== */
+.dash-theme {
+  --color-brand-ink: #1E293B;
+  --color-brand-mist: #E2E8F0;
+  --color-brand-softmist: #EEF2F6;
+  --color-brand-paper: #F5F7FA;
+  --color-brand-muted: #64748B;
+  --color-ink: #1E293B;
+  --color-mist: #E2E8F0;
+  --color-softmist: #EEF2F6;
+  background-color: var(--color-brand-paper);
+  color: var(--color-brand-ink);
 }
 
 /* ========================================================

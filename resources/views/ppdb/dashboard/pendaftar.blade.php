@@ -11,28 +11,28 @@
         <!-- Status Filter Tabs -->
         <div class="flex items-center flex-wrap gap-1.5">
             <a href="{{ route('ppdb.dashboard.pendaftar', array_merge(request()->except('status', 'page'), [])) }}" 
-               class="px-4 py-2 rounded-xl text-xs font-semibold {{ empty($status) ? 'bg-[#241012] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }} transition-all flex items-center gap-2">
+               class="px-4 py-2 rounded-xl text-xs font-semibold {{ empty($status) ? 'bg-[#1E293B] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }} transition-all flex items-center gap-2">
                 <span>Semua</span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ empty($status) ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600' }}">
                     {{ $countAll }}
                 </span>
             </a>
             <a href="{{ route('ppdb.dashboard.pendaftar', array_merge(request()->except('page'), ['status' => 'menunggu_verifikasi'])) }}" 
-               class="px-4 py-2 rounded-xl text-xs font-semibold {{ $status === 'menunggu_verifikasi' ? 'bg-[#241012] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }} transition-all flex items-center gap-2">
+               class="px-4 py-2 rounded-xl text-xs font-semibold {{ $status === 'menunggu_verifikasi' ? 'bg-[#1E293B] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }} transition-all flex items-center gap-2">
                 <span>Menunggu</span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $status === 'menunggu_verifikasi' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800' }}">
                     {{ $countMenunggu }}
                 </span>
             </a>
             <a href="{{ route('ppdb.dashboard.pendaftar', array_merge(request()->except('page'), ['status' => 'terverifikasi'])) }}" 
-               class="px-4 py-2 rounded-xl text-xs font-semibold {{ $status === 'terverifikasi' ? 'bg-[#241012] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }} transition-all flex items-center gap-2">
+               class="px-4 py-2 rounded-xl text-xs font-semibold {{ $status === 'terverifikasi' ? 'bg-[#1E293B] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }} transition-all flex items-center gap-2">
                 <span>Terverifikasi</span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $status === 'terverifikasi' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800' }}">
                     {{ $countTerverifikasi }}
                 </span>
             </a>
             <a href="{{ route('ppdb.dashboard.pendaftar', array_merge(request()->except('page'), ['status' => 'lulus_seleksi'])) }}" 
-               class="px-4 py-2 rounded-xl text-xs font-semibold {{ $status === 'lulus_seleksi' ? 'bg-[#241012] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }} transition-all flex items-center gap-2">
+               class="px-4 py-2 rounded-xl text-xs font-semibold {{ $status === 'lulus_seleksi' ? 'bg-[#1E293B] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }} transition-all flex items-center gap-2">
                 <span>Lulus</span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $status === 'lulus_seleksi' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-800' }}">
                     {{ $countLulus }}
@@ -129,7 +129,7 @@
 
             <!-- Submit & Reset -->
             <div class="sm:col-span-1 flex items-center gap-1.5">
-                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-[#241012] hover:bg-slate-800 text-white text-xs font-semibold transition-all cursor-pointer text-center shadow-xs">
+                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-[#1E293B] hover:bg-slate-800 text-white text-xs font-semibold transition-all cursor-pointer text-center shadow-xs">
                     Cari
                 </button>
                 @if ($search || $jurusan || $status || ($sort && $sort !== 'terbaru'))
@@ -149,10 +149,10 @@
         <!-- Table Top Info Strip -->
         <div class="px-5 py-3.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-slate-50/50">
             <div class="flex items-center gap-2.5">
-                <span class="text-xs font-bold text-[#241012]">
+                <span class="text-xs font-bold text-[#1E293B]">
                     Total Ditemukan:
                 </span>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#241012] text-white">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#1E293B] text-white">
                     {{ $pendaftarList->total() }} Pendaftar
                 </span>
                 @if ($search)
@@ -294,7 +294,7 @@
 
                                     <!-- Detail & Update Button -->
                                     <a href="{{ route('ppdb.dashboard.pendaftar.detail', $pendaftar->id) }}" 
-                                       class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#241012] hover:bg-slate-800 text-white shadow-xs transition-all inline-block"
+                                       class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#1E293B] hover:bg-slate-800 text-white shadow-xs transition-all inline-block"
                                        title="Edit Data Pendaftar">
                                         Edit / Detail
                                     </a>

@@ -72,7 +72,7 @@
         <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div class="space-y-2">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <span class="tabular-nums text-xs font-bold px-3 py-1 rounded-full bg-[#241012] text-white shadow-xs">
+                    <span class="tabular-nums text-xs font-bold px-3 py-1 rounded-full bg-[#1E293B] text-white shadow-xs">
                         {{ $pendaftar->nomor_registrasi }}
                     </span>
                     @php $badge = $pendaftar->status_badge; @endphp
@@ -83,7 +83,7 @@
                         Terdaftar: {{ $pendaftar->created_at->format('d F Y, H:i') }} WIB
                     </span>
                 </div>
-                <h2 class="text-2xl sm:text-3xl font-bold text-[#241012] tracking-tight">
+                <h2 class="text-2xl sm:text-3xl font-bold text-[#1E293B] tracking-tight">
                     {{ $pendaftar->nama_lengkap }}
                 </h2>
                 <div class="text-xs sm:text-sm text-slate-500 flex items-center gap-2.5 flex-wrap">
@@ -126,7 +126,7 @@
             <div class="flex items-center gap-2.5 pb-3 mb-4 border-b border-slate-100">
                 <span class="w-7 h-7 rounded-xl bg-[#7A1018] text-white flex items-center justify-center font-bold text-xs shadow-xs">1</span>
                 <div>
-                    <h3 class="font-bold text-sm text-[#241012] tracking-tight">
+                    <h3 class="font-bold text-sm text-[#1E293B] tracking-tight">
                         Status Verifikasi & Catatan Panitia PPDB
                     </h3>
                     <p class="text-xs text-slate-400">Atur progres berkas dan catatan verifikasi pendaftar</p>
@@ -172,9 +172,9 @@
         <!-- SECTION 2: DATA DIRI CALON SISWA -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
             <div class="flex items-center gap-2.5 pb-3 mb-4 border-b border-slate-100">
-                <span class="w-7 h-7 rounded-xl bg-[#241012] text-white flex items-center justify-center font-bold text-xs shadow-xs">2</span>
+                <span class="w-7 h-7 rounded-xl bg-[#1E293B] text-white flex items-center justify-center font-bold text-xs shadow-xs">2</span>
                 <div>
-                    <h3 class="font-bold text-sm text-[#241012] tracking-tight">
+                    <h3 class="font-bold text-sm text-[#1E293B] tracking-tight">
                         Data Diri Calon Siswa
                     </h3>
                     <p class="text-xs text-slate-400">Informasi identitas personal calon siswa baru</p>
@@ -281,9 +281,9 @@
         <!-- SECTION 3: PILIHAN JURUSAN & ASAL SEKOLAH -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
             <div class="flex items-center gap-2.5 pb-3 mb-4 border-b border-slate-100">
-                <span class="w-7 h-7 rounded-xl bg-[#241012] text-white flex items-center justify-center font-bold text-xs shadow-xs">3</span>
+                <span class="w-7 h-7 rounded-xl bg-[#1E293B] text-white flex items-center justify-center font-bold text-xs shadow-xs">3</span>
                 <div>
-                    <h3 class="font-bold text-sm text-[#241012] tracking-tight">
+                    <h3 class="font-bold text-sm text-[#1E293B] tracking-tight">
                         Pilihan Program Jurusan & Asal Sekolah
                     </h3>
                     <p class="text-xs text-slate-400">Kompetensi keahlian dan riwayat pendidikan sebelumnya</p>
@@ -359,9 +359,9 @@
         <!-- SECTION 4: KONTAK SISWA & ORANG TUA -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
             <div class="flex items-center gap-2.5 pb-3 mb-4 border-b border-slate-100">
-                <span class="w-7 h-7 rounded-xl bg-[#241012] text-white flex items-center justify-center font-bold text-xs shadow-xs">4</span>
+                <span class="w-7 h-7 rounded-xl bg-[#1E293B] text-white flex items-center justify-center font-bold text-xs shadow-xs">4</span>
                 <div>
-                    <h3 class="font-bold text-sm text-[#241012] tracking-tight">
+                    <h3 class="font-bold text-sm text-[#1E293B] tracking-tight">
                         Nomor Kontak WhatsApp & Komunikasi
                     </h3>
                     <p class="text-xs text-slate-400">Kontak utama untuk notifikasi dan pengumuman seleksi</p>
@@ -404,9 +404,9 @@
         <!-- SECTION 5: INFORMASI TAMBAHAN & LAYANAN -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
             <div class="flex items-center gap-2.5 pb-3 mb-4 border-b border-slate-100">
-                <span class="w-7 h-7 rounded-xl bg-[#241012] text-white flex items-center justify-center font-bold text-xs shadow-xs">5</span>
+                <span class="w-7 h-7 rounded-xl bg-[#1E293B] text-white flex items-center justify-center font-bold text-xs shadow-xs">5</span>
                 <div>
-                    <h3 class="font-bold text-sm text-[#241012] tracking-tight">
+                    <h3 class="font-bold text-sm text-[#1E293B] tracking-tight">
                         Informasi Tambahan Pendaftar
                     </h3>
                     <p class="text-xs text-slate-400">Sumber informasi dan alasan memilih sekolah</p>

@@ -22,15 +22,10 @@
     <style>
         [x-cloak] { display: none !important; }
 
-        body.admin-body {
-            background-color: #F5F4F2;
-            color: #241012;
-        }
-
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #F5F4F2; }
-        ::-webkit-scrollbar-thumb { background: #DDDDDD; border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #A66B6E; }
+        ::-webkit-scrollbar-track { background: #F5F7FA; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
     </style>
     @stack('styles')
 </head>
@@ -60,17 +55,11 @@
         ['label' => 'Cek Status Siswa', 'icon' => 'search-check', 'route' => 'ppdb.cek-status'],
         ['label' => 'Pengumuman Publik', 'icon' => 'newspaper', 'route' => 'ppdb.pengumuman'],
     ];
-
-    $shortcuts = [
-        ['label' => 'CMS Portal Utama', 'icon' => 'globe', 'href' => config('app.cms_admin_url')],
-        ['label' => 'Admin BKK', 'icon' => 'briefcase', 'href' => config('app.bkk_admin_url')],
-        ['label' => 'Admin PPDB', 'icon' => 'school', 'current' => true],
-    ];
 @endphp
 
 <body x-data="{ sidebarOpen: false, profileDropdown: false, notifDropdown: false }"
     @keydown.escape.window="sidebarOpen = false; profileDropdown = false; notifDropdown = false"
-    class="admin-body h-full antialiased selection:bg-brand-darkred selection:text-white">
+    class="admin-body dash-theme h-full antialiased selection:bg-brand-darkred selection:text-white">
 
     <!-- HEADER -->
     <header class="sticky top-0 z-30 h-16 bg-white/95 backdrop-blur border-b border-brand-ink/10 flex items-center gap-2 px-3 sm:px-5">
@@ -78,18 +67,18 @@
             <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
 
-        <a href="{{ route('ppdb.dashboard') }}" class="flex items-center gap-2.5 group shrink-0" title="Dashboard PPDB">
-            <img src="{{ asset('assets/logo-penus.png') }}" alt="SMK Plus Pelita Nusantara" class="h-8 w-auto group-hover:opacity-90 transition-opacity">
-            <span class="hidden sm:flex flex-col pl-2.5 border-l border-brand-ink/15">
-                <span class="font-display text-[15px] font-bold uppercase tracking-wide text-brand-ink leading-tight group-hover:text-brand-darkred transition-colors">PPDB</span>
-                <span class="text-[10px] uppercase font-semibold tracking-wider text-brand-darkred mt-0.5">Panel Panitia</span>
+        <a href="{{ route('ppdb.dashboard') }}" class="flex items-center gap-2.5 group shrink-0" title="Dashboard Admin PPDB">
+            <img src="{{ asset('assets/logosmkpenus.png') }}" alt="Logo SMK Plus Pelita Nusantara" class="w-9 h-9 object-contain group-hover:scale-105 transition-transform">
+            <span class="hidden sm:flex flex-col">
+                <span class="font-display text-[15px] font-bold uppercase tracking-wide text-brand-ink leading-tight group-hover:text-brand-darkred transition-colors">PPDB Pelita Nusantara</span>
+                <span class="text-[10px] uppercase font-semibold tracking-wider text-brand-darkred mt-0.5">Panel Admin</span>
             </span>
         </a>
 
         <!-- Pencarian pendaftar -->
         <div class="flex-1 max-w-xl mx-auto hidden md:block">
             <form action="{{ route('ppdb.dashboard.pendaftar') }}" method="GET" role="search">
-                <label class="flex items-center gap-3 h-10 rounded-full bg-[#F5F4F2] border border-brand-ink/10 focus-within:bg-white focus-within:border-brand-darkred focus-within:ring-4 focus-within:ring-brand-darkred/10 px-4 transition-all">
+                <label class="flex items-center gap-3 h-10 rounded-full bg-brand-paper border border-brand-ink/10 focus-within:bg-white focus-within:border-brand-darkred focus-within:ring-4 focus-within:ring-brand-darkred/10 px-4 transition-all">
                     <i data-lucide="search" class="w-4 h-4 text-brand-ink/50"></i>
                     <input type="search" name="search" value="{{ request()->routeIs('ppdb.dashboard.pendaftar') ? request('search') : '' }}"
                         placeholder="Cari nama, no. registrasi, NISN, atau asal sekolah…" aria-label="Cari pendaftar"
@@ -113,13 +102,13 @@
                     @endif
                 </button>
                 <div x-show="notifDropdown" x-cloak x-transition.opacity.duration.150ms class="absolute right-0 mt-2 w-[min(22rem,calc(100vw-1.5rem))] bg-white rounded-card border border-brand-ink/10 shadow-softpill overflow-hidden z-50">
-                    <div class="px-4 py-3 border-b border-brand-ink/10 flex justify-between items-center bg-[#F5F4F2]">
+                    <div class="px-4 py-3 border-b border-brand-ink/10 flex justify-between items-center bg-brand-paper">
                         <span class="font-display font-bold uppercase tracking-wide text-sm text-brand-ink">Pendaftar Terbaru</span>
                         <span class="text-[11px] font-bold px-2 py-0.5 rounded-full {{ $unverifiedCount > 0 ? 'text-brand-darkred bg-brand-darkred/10' : 'text-emerald-700 bg-emerald-50' }}">{{ $unverifiedCount }} menunggu</span>
                     </div>
                     <div class="divide-y divide-brand-ink/5 max-h-80 overflow-y-auto">
                         @forelse($recentRegistrations as $reg)
-                            <a href="{{ route('ppdb.dashboard.pendaftar.detail', $reg->id) }}" class="flex gap-3 px-4 py-3 hover:bg-[#F5F4F2] transition-colors">
+                            <a href="{{ route('ppdb.dashboard.pendaftar.detail', $reg->id) }}" class="flex gap-3 px-4 py-3 hover:bg-brand-paper transition-colors">
                                 <span class="mt-1.5 w-2 h-2 rounded-full shrink-0 {{ $reg->status === 'menunggu_verifikasi' ? 'bg-brand-darkred' : 'bg-brand-ink/20' }}"></span>
                                 <span class="min-w-0 flex-1">
                                     <span class="flex justify-between gap-2">
@@ -133,7 +122,7 @@
                             <p class="px-4 py-8 text-center text-sm text-brand-ink/50">Belum ada pendaftaran baru.</p>
                         @endforelse
                     </div>
-                    <a href="{{ route('ppdb.dashboard.pendaftar') }}" class="block px-4 py-2.5 text-center text-xs font-bold text-brand-darkred border-t border-brand-ink/10 hover:bg-[#F5F4F2]">Lihat seluruh pendaftar</a>
+                    <a href="{{ route('ppdb.dashboard.pendaftar') }}" class="block px-4 py-2.5 text-center text-xs font-bold text-brand-darkred border-t border-brand-ink/10 hover:bg-brand-paper">Lihat seluruh pendaftar</a>
                 </div>
             </div>
 
@@ -156,8 +145,8 @@
                         <div class="text-xs text-brand-ink/60 truncate">{{ $userEmail }}</div>
                         <span class="inline-block mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-brand-softmist text-brand-ink">{{ $userRole }}</span>
                     </div>
-                    <a href="{{ route('ppdb.dashboard') }}" class="flex items-center gap-3 px-2 py-2 rounded-xl text-xs font-medium text-brand-ink hover:bg-[#F5F4F2]"><i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-ink/50"></i>Dashboard Utama</a>
-                    <a href="{{ route('ppdb.dashboard.pendaftar') }}" class="flex items-center gap-3 px-2 py-2 rounded-xl text-xs font-medium text-brand-ink hover:bg-[#F5F4F2]"><i data-lucide="users" class="w-4 h-4 text-brand-ink/50"></i>Kelola Pendaftar</a>
+                    <a href="{{ route('ppdb.dashboard') }}" class="flex items-center gap-3 px-2 py-2 rounded-xl text-xs font-medium text-brand-ink hover:bg-brand-paper"><i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-ink/50"></i>Dashboard Utama</a>
+                    <a href="{{ route('ppdb.dashboard.pendaftar') }}" class="flex items-center gap-3 px-2 py-2 rounded-xl text-xs font-medium text-brand-ink hover:bg-brand-paper"><i data-lucide="users" class="w-4 h-4 text-brand-ink/50"></i>Kelola Pendaftar</a>
                     <form action="{{ route('ppdb.logout') }}" method="POST" class="mt-1 pt-1 border-t border-brand-ink/10">
                         @csrf
                         <button type="submit" class="w-full flex items-center gap-3 px-2 py-2 rounded-xl text-xs font-bold text-brand-darkred hover:bg-brand-darkred/5 cursor-pointer"><i data-lucide="log-out" class="w-4 h-4"></i>Keluar Sesi</button>
@@ -189,7 +178,7 @@
                     @foreach($navItems as $item)
                         @php $isActive = $item['active'](); @endphp
                         <a href="{{ route($item['route']) }}" @if($isActive) aria-current="page" @endif
-                            class="group flex items-center justify-between gap-2 h-10 px-3 rounded-xl text-[13px] transition-colors {{ $isActive ? 'bg-[#F5F4F2] text-brand-darkred font-bold' : 'text-brand-ink font-medium hover:bg-[#F5F4F2]' }}">
+                            class="group flex items-center justify-between gap-2 h-10 px-3 rounded-xl text-[13px] transition-colors {{ $isActive ? 'bg-brand-paper text-brand-darkred font-bold' : 'text-brand-ink font-medium hover:bg-brand-paper' }}">
                             <span class="flex items-center gap-3 min-w-0">
                                 <i data-lucide="{{ $item['icon'] }}" class="w-4 h-4 shrink-0 {{ $isActive ? 'text-brand-darkred' : 'text-brand-ink/50 group-hover:text-brand-ink' }}"></i>
                                 @if($isActive)
@@ -211,32 +200,14 @@
                         <span class="h-px flex-1 bg-brand-ink/10"></span>
                     </div>
                     @foreach($publicLinks as $item)
-                        <a href="{{ route($item['route']) }}" target="_blank" rel="noopener" class="group flex items-center justify-between h-10 px-3 rounded-xl text-[13px] font-medium text-brand-ink hover:bg-[#F5F4F2] transition-colors">
+                        <a href="{{ route($item['route']) }}" target="_blank" rel="noopener" class="group flex items-center justify-between h-10 px-3 rounded-xl text-[13px] font-medium text-brand-ink hover:bg-brand-paper transition-colors">
                             <span class="flex items-center gap-3"><i data-lucide="{{ $item['icon'] }}" class="w-4 h-4 text-brand-ink/50 group-hover:text-brand-ink"></i>{{ $item['label'] }}</span>
                             <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-brand-ink/40 group-hover:text-brand-darkred"></i>
                         </a>
                     @endforeach
                 </nav>
 
-                <nav class="space-y-0.5">
-                    <div class="px-3 pb-1.5 flex items-center gap-2">
-                        <span class="font-display text-[11px] font-bold uppercase tracking-[0.12em] text-brand-darkred">Pintas Dashboard</span>
-                        <span class="h-px flex-1 bg-brand-ink/10"></span>
-                    </div>
-                    @foreach($shortcuts as $item)
-                        @if(!empty($item['current']))
-                            <div class="flex items-center justify-between h-10 px-3 rounded-xl text-[13px] font-semibold bg-brand-ink text-white">
-                                <span class="flex items-center gap-3"><i data-lucide="{{ $item['icon'] }}" class="w-4 h-4"></i>{{ $item['label'] }}</span>
-                                <span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-white/15">Aktif</span>
-                            </div>
-                        @else
-                            <a href="{{ $item['href'] }}" class="group flex items-center justify-between h-10 px-3 rounded-xl text-[13px] font-medium text-brand-ink hover:bg-[#F5F4F2] transition-colors">
-                                <span class="flex items-center gap-3"><i data-lucide="{{ $item['icon'] }}" class="w-4 h-4 text-brand-ink/50 group-hover:text-brand-ink"></i>{{ $item['label'] }}</span>
-                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-brand-ink/40 group-hover:text-brand-darkred"></i>
-                            </a>
-                        @endif
-                    @endforeach
-                </nav>
+                @include('partials.dashboard-shortcuts', ['current' => 'ppdb', 'currentHref' => route('ppdb.dashboard')])
             </div>
 
             <div class="p-3 border-t border-brand-ink/10">
