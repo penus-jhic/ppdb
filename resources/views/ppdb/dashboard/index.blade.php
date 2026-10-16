@@ -54,7 +54,7 @@
                     {{ $greet }}, <x-sketch.underline size="md">{{ $firstName }}</x-sketch.underline>
                 </h1>
                 <p class="mt-5 text-sm sm:text-[15px] text-brand-ink/70 leading-relaxed max-w-2xl">
-                    Sudah ada <b class="text-brand-ink">{{ number_format($totalPendaftar) }} calon siswa</b> yang mendaftar@if($todayCount > 0) (<b class="text-brand-ink">{{ $todayCount }}</b> hari ini)@endif.
+                    Sudah ada <b class="text-brand-ink">{{ number_format($totalPendaftar) }} calon siswa</b> yang mendaftar{!! $todayCount > 0 ? ' (<b class="text-brand-ink">'.e($todayCount).'</b> hari ini)' : '' !!}.
                     @if($totalMenunggu > 0)
                         <b class="text-brand-darkred">{{ $totalMenunggu }} berkas</b> masih menunggu verifikasi panitia.
                     @else
