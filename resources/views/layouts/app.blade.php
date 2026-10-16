@@ -8,7 +8,7 @@
     <meta name="description" content="@yield('meta_description', 'Portal Resmi Pendaftaran Peserta Didik Baru (PPDB) SMK Plus Pelita Nusantara Bogor. Pilihan Jurusan Vokasi Unggulan & Fasilitas Terlengkap.')">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('assets/logosmkpenus.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/logofavicon.png') }}">
 
     <!-- Google Fonts: Oswald & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
